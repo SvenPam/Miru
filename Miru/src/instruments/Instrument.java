@@ -1,5 +1,7 @@
 package instruments;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * A simple instrument.
  * 
@@ -16,8 +18,7 @@ public abstract class Instrument {
 
 	public String strName;
 	public int intID;
-	public double dblLat;
-	public double dblLong;
+	public LatLng latLng;
 
 	// public Image imgInstrumentIcon
 
@@ -37,20 +38,8 @@ public abstract class Instrument {
 		this.intID = intID;
 	}
 
-	public double GetLat() {
-		return dblLat;
-	}
-
-	public void SetLat(double dblLat) {
-		this.dblLat = dblLat;
-	}
-
-	public double GetLong() {
-		return dblLong;
-	}
-
-	public void SetLong(double dblLong) {
-		this.dblLong = dblLong;
+	public LatLng GetLatLng() {
+		return this.latLng;
 	}
 
 }

@@ -1,6 +1,8 @@
 package instruments;
 
-public/**
+import com.google.android.gms.maps.model.LatLng;
+
+/**
 * Represents a simple pipe.
 * 
 * @author Stephen Pammenter 
@@ -11,12 +13,12 @@ public/**
 * Uni ID: K0025970 
 * 
 * Created: 06-DEC-2013
-*/class Pipe extends Instrument {
+*/
+public class Pipe extends Instrument {
 
-	public Pipe(String Name, int ID, double Lat, double Long) {
+	public Pipe(String Name, int ID, LatLng LatLong) {
 		this.strName = Name;
 		this.intID = ID;
-		this.dblLat = Lat;
-		this.dblLong = Long;
+		this.latLng = LatLong;
 	}
 }

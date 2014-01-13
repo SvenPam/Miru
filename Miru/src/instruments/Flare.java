@@ -1,5 +1,7 @@
 package instruments;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Represents a flare.
  * 
@@ -14,11 +16,10 @@ package instruments;
  * */
 public class Flare extends Instrument {
 
-	public Flare(String Name, int ID, double Lat, double Long) {
+	public Flare(String Name, int ID, LatLng LatLong) {
 		this.strName = Name;
 		this.intID = ID;
-		this.dblLat = Lat;
-		this.dblLong = Long;
+		this.latLng = LatLong;
 	}
 
 }

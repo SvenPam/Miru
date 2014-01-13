@@ -1,5 +1,7 @@
 package instruments;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Represents one Tank.
  * 
@@ -17,11 +19,9 @@ public class Tank extends Instrument {
 	/**
 	 * 
 	 */
-	public Tank(String Name, int ID, double Lat, double Long) {
+	public Tank(String Name, int ID, LatLng LatLong) {
 		this.strName = Name;
 		this.intID = ID;
-		this.dblLat = Lat;
-		this.dblLong = Long;
+		this.latLng = LatLong;
 	}
-
 }
