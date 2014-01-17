@@ -17,8 +17,9 @@ import com.google.android.gms.maps.model.LatLng;
 public abstract class Instrument {
 
 	public String strName;
-	public int intID;
+	public Integer intID;
 	public LatLng latLng;
+	public int intIconID;
 
 	// public Image imgInstrumentIcon
 
@@ -30,7 +31,7 @@ public abstract class Instrument {
 		this.strName = strName;
 	}
 
-	public int GetID() {
+	public Integer GetID() {
 		return intID;
 	}
 
@@ -40,6 +41,15 @@ public abstract class Instrument {
 
 	public LatLng GetLatLng() {
 		return this.latLng;
+	}
+
+	public int GetIconID() {
+		return this.intIconID;
+	}
+
+	@Override
+	public String toString() {
+		return this.strName;
 	}
 
 }

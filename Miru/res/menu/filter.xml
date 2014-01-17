@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+	<item android:id="@+id/action_filter"
+          android:icon="@drawable/filter_icon"
+          android:title="Filter"
+          android:showAsAction="always">
+           <menu>
+        <item
+            android:id="@+id/Tank"
+             android:icon="@drawable/marker_pin_tank"
+            android:title="Tank"
+            android:checkable="true"
+            android:checked="true" />
+        <item
+            android:id="@+id/Pipe"
+            android:icon="@drawable/marker_pin_pipe"
+            android:title="Pipe"
+            android:checkable="true"
+            android:checked="true" />
+          <item
+            android:id="@+id/Flare"
+            android:icon="@drawable/marker_pin_flare"
+            android:title="Flare"
+            android:checkable="true"
+            android:checked="true" />
+    </menu>
+          </item>
+</menu>

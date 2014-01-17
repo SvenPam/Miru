@@ -1,16 +1,21 @@
-package com.example.miru;
+package main;
 
 import instruments.Instrument;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
+import com.example.miru.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -24,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -52,9 +58,10 @@ public class MainActivity extends FragmentActivity implements
 	/**Defines the map overlay.*/
 	private UiSettings mUISettings;
 	/**HashMap of key value pairs, key: marker and value: an instrument. Used between fragments.*/
-	private Map<Marker, Instrument> mapMarkers;
+	private static Map<Marker, Instrument> mapMarkers;
 	/**Used to prevent the map re-zooming to user location after initial startup.*/
 	private boolean blnIsReady;
+	/**All filler, no thriller. DELETE after data implementation*/
 	private SampleData sd;
 
 	@Override
@@ -65,10 +72,21 @@ public class MainActivity extends FragmentActivity implements
 		sd = new SampleData();
 	}
 
+	/**
+	 * Populates the action bar.
+	 * */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.filter, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		System.out.println("Test");
 		setUpMapIfNeeded();
 		setUpLocationClientIfNeeded();
 		mLocationClient.connect();
@@ -79,13 +97,9 @@ public class MainActivity extends FragmentActivity implements
 
 			public void onInfoWindowClick(Marker marker) {
 
-				Instrument inst = mapMarkers.get(marker);
-
-				Toast.makeText(getBaseContext(),
-
-				"The date of " + inst.GetName(),
-
-				Toast.LENGTH_LONG).show();
+				Intent intent = new Intent(MainActivity.this,
+						InstrumentListActivity.class);
+				startActivity(intent);
 
 			}
 
@@ -190,12 +204,56 @@ public class MainActivity extends FragmentActivity implements
 				.hasNext();) {
 			Instrument inst = i.next();
 
-			marker = mMap.addMarker(new MarkerOptions()
-					.position(inst.GetLatLng()).title(inst.GetName())
-					.snippet("Test Data"));
+			marker = mMap
+					.addMarker(new MarkerOptions()
+							.position(inst.GetLatLng())
+							.title(inst.GetName())
+							.snippet(
+									"We need to decide what we want in this Info box.")
+							.icon(BitmapDescriptorFactory.fromResource(inst
+									.GetIconID())));
 			mapMarkers.put(marker, inst); // Note: Markers are used as a key,
 											// and the instrument as a value.
-
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.Pipe:
+			item.setChecked(!item.isChecked());
+			filterMapMarkers("class instruments.Pipe");
+			return true;
+		case R.id.Flare:
+			item.setChecked(!item.isChecked());
+			filterMapMarkers("class instruments.Flare");
+			return true;
+		case R.id.Tank:
+			item.setChecked(!item.isChecked());
+			filterMapMarkers("class instruments.Tank");
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	/**
+	 * Toggles visibility of specified marker type.
+	 * */
+	private void filterMapMarkers(String Type) {
+		for (Entry<Marker, Instrument> i : mapMarkers.entrySet()) {
+			if (i.getValue().getClass().toString().equals(Type)) {
+				if (i.getKey().isVisible()) {
+					i.getKey().setVisible(false);
+				} else {
+					i.getKey().setVisible(true);
+				}
+
+			}
+		}
+	}
+
+	public static Map<Marker, Instrument> GetInstruments() {
+		return MainActivity.mapMarkers;
 	}
 }

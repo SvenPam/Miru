@@ -1,4 +1,4 @@
-package com.example.miru;
+package main;
 
 import instruments.Flare;
 import instruments.Instrument;

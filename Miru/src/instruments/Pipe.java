@@ -1,5 +1,6 @@
 package instruments;
 
+import com.example.miru.R;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -20,5 +21,6 @@ public class Pipe extends Instrument {
 		this.strName = Name;
 		this.intID = ID;
 		this.latLng = LatLong;
+		this.intIconID = R.drawable.marker_pin_pipe;
 	}
 }
