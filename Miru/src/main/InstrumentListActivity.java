@@ -1,6 +1,8 @@
 package main;
 
 import com.example.miru.R;
+import com.example.miru.R.id;
+import com.example.miru.R.layout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,14 +17,17 @@ import android.view.MenuItem;
  * lead to a {@link InstrumentDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
- * <p>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link InstrumentListFragment} and the item details
- * (if present) is a {@link InstrumentDetailFragment}.
- * <p>
- * This activity also implements the required
- * {@link InstrumentListFragment.Callbacks} interface
- * to listen for item selections.
+ *
+ * Final Year Project
+ * 
+ * @author Stephen Pammenter 
+ * E: spammenter@live.com 
+ * W: www.ste-pam.com 
+ * 
+ * Teesside University 
+ * Uni ID: K0025970 
+ * 
+ * Created: 15-JAN-2013
  */
 public class InstrumentListActivity extends FragmentActivity implements
 		InstrumentListFragment.Callbacks {
@@ -54,7 +59,7 @@ public class InstrumentListActivity extends FragmentActivity implements
 					.setActivateOnItemClick(true);
 		}
 
-		// TODO: If exposing deep links into your app, handle intents here.
+		onItemSelected(MainActivity.intSelectedMarker.toString());
 	}
 
 	@Override

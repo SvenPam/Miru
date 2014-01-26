@@ -1,5 +1,7 @@
 package instruments;
 
+import java.util.List;
+
 import com.example.miru.R;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -15,12 +17,41 @@ import com.google.android.gms.maps.model.LatLng;
 * 
 * Created: 06-DEC-2013
 */
-public class Pipe extends Instrument {
+public class Pipe extends Instrument implements properties.Flow,
+		properties.Route {
 
-	public Pipe(String Name, int ID, LatLng LatLong) {
+	private List<LatLng> ltLngRoute;
+
+	public Pipe(String Name, int ID, LatLng LatLong, String Description,
+			List<LatLng> Route) {
 		this.strName = Name;
 		this.intID = ID;
 		this.latLng = LatLong;
 		this.intIconID = R.drawable.marker_pin_pipe;
+		this.strDescription = Description;
+		this.ltLngRoute = Route;
 	}
+
+	@Override
+	public List<LatLng> getRoute() {
+		return ltLngRoute;
+	}
+
+	@Override
+	public void setRoute(List<LatLng> Route) {
+		this.ltLngRoute = Route;
+	}
+
+	@Override
+	public void addPoint(LatLng latlng) {
+		ltLngRoute.add(latlng);
+
+	}
+
+	@Override
+	public void removePoint(LatLng latlng) {
+		ltLngRoute.remove(latlng);
+
+	}
+
 }

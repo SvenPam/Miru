@@ -20,10 +20,11 @@ public abstract class Instrument {
 	public Integer intID;
 	public LatLng latLng;
 	public int intIconID;
+	public String strDescription;
 
 	// public Image imgInstrumentIcon
 
-	public String GetName() {
+	public String getName() {
 		return strName;
 	}
 
@@ -45,6 +46,10 @@ public abstract class Instrument {
 
 	public int GetIconID() {
 		return this.intIconID;
+	}
+
+	public String getDescription() {
+		return this.strDescription;
 	}
 
 	@Override

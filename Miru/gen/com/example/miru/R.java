@@ -221,14 +221,15 @@ containing a value of this type.
         public static final int marker_pin_tank=0x7f020020;
     }
     public static final class id {
-        public static final int Flare=0x7f05000c;
-        public static final int Pipe=0x7f05000b;
-        public static final int Tank=0x7f05000a;
-        public static final int action_filter=0x7f050009;
-        public static final int action_settings=0x7f05000d;
-        public static final int group1=0x7f05000e;
+        public static final int Flare=0x7f05000d;
+        public static final int Pipe=0x7f05000c;
+        public static final int Tank=0x7f05000b;
+        public static final int action_filter=0x7f05000a;
+        public static final int action_settings=0x7f05000e;
+        public static final int detail_Name=0x7f050008;
+        public static final int detail_description=0x7f050009;
+        public static final int group1=0x7f05000f;
         public static final int hybrid=0x7f050004;
-        public static final int instrument_detail=0x7f050008;
         public static final int instrument_detail_container=0x7f050005;
         public static final int instrument_list=0x7f050006;
         public static final int map=0x7f050007;

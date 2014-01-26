@@ -17,11 +17,12 @@ import com.google.android.gms.maps.model.LatLng;
  * */
 public class Flare extends Instrument {
 
-	public Flare(String Name, int ID, LatLng LatLong) {
+	public Flare(String Name, int ID, LatLng LatLong, String Description) {
 		this.strName = Name;
 		this.intID = ID;
 		this.latLng = LatLong;
 		this.intIconID = R.drawable.marker_pin_flare;
+		this.strDescription = Description;
 	}
 
 }

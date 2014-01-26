@@ -7,7 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import properties.Route;
+
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -33,6 +36,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 /**
  * The main activity for the Miru which intiliazes the app. 
@@ -61,6 +66,9 @@ public class MainActivity extends FragmentActivity implements
 	private static Map<Marker, Instrument> mapMarkers;
 	/**Used to prevent the map re-zooming to user location after initial startup.*/
 	private boolean blnIsReady;
+	/**Stored the ID of the last selected marker.*/
+	public static Integer intSelectedMarker;
+
 	/**All filler, no thriller. DELETE after data implementation*/
 	private SampleData sd;
 
@@ -96,7 +104,7 @@ public class MainActivity extends FragmentActivity implements
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
 			public void onInfoWindowClick(Marker marker) {
-
+				intSelectedMarker = mapMarkers.get(marker).GetID();
 				Intent intent = new Intent(MainActivity.this,
 						InstrumentListActivity.class);
 				startActivity(intent);
@@ -177,6 +185,7 @@ public class MainActivity extends FragmentActivity implements
 				mMap.setMapType(4); // Hybrid map.
 				mUISettings = mMap.getUiSettings();
 				mUISettings.setCompassEnabled(true);
+
 			}
 		}
 	}
@@ -207,13 +216,20 @@ public class MainActivity extends FragmentActivity implements
 			marker = mMap
 					.addMarker(new MarkerOptions()
 							.position(inst.GetLatLng())
-							.title(inst.GetName())
+							.title(inst.getName())
 							.snippet(
 									"We need to decide what we want in this Info box.")
 							.icon(BitmapDescriptorFactory.fromResource(inst
 									.GetIconID())));
 			mapMarkers.put(marker, inst); // Note: Markers are used as a key,
 											// and the instrument as a value.
+
+			if (inst instanceof Route) {
+
+				mMap.addPolyline(new PolylineOptions()
+						.addAll(((Route) inst).getRoute()).width(3)
+						.color(Color.BLUE));
+			}
 		}
 	}
 

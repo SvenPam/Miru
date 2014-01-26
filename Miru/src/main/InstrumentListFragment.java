@@ -1,6 +1,5 @@
 package main;
 
-import instruments.Instrument;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -8,11 +7,24 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import instruments.Instrument;
+
 /**
  * A list fragment representing a list of Instruments. This fragment
  * also supports tablet devices by allowing list items to be given an
  * 'activated' state upon selection. This helps indicate which item is
  * currently being viewed in a {@link InstrumentDetailFragment}.
+ *
+ * Final Year Project
+ * 
+ * @author Stephen Pammenter 
+ * E: spammenter@live.com 
+ * W: www.ste-pam.com 
+ * 
+ * Teesside University 
+ * Uni ID: K0025970 
+ * 
+ * Created: 15-JAN-2013
  */
 public class InstrumentListFragment extends ListFragment {
 
@@ -66,10 +78,10 @@ public class InstrumentListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// TODO: replace with a real list adapter.
 		setListAdapter(new ArrayAdapter<Instrument>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
 				android.R.id.text1, Data.InstrumentList));
-
 	}
 
 	@Override
@@ -112,7 +124,7 @@ public class InstrumentListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(Data.InstrumentList.get(position).GetID()
+		mCallbacks.onItemSelected(Data.InstrumentList.get(position).intID
 				.toString());
 	}
 

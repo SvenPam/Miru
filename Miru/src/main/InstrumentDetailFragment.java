@@ -1,6 +1,8 @@
 package main;
 
 import com.example.miru.R;
+import com.example.miru.R.id;
+import com.example.miru.R.layout;
 
 import instruments.Instrument;
 import android.os.Bundle;
@@ -10,12 +12,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 /**
  * A fragment representing a single Instrument detail screen.
  * This fragment is either contained in a {@link InstrumentListActivity}
  * in two-pane mode (on tablets) or a {@link InstrumentDetailActivity}
  * on handsets.
+ *
+ * Final Year Project
+ * 
+ * @author Stephen Pammenter 
+ * E: spammenter@live.com 
+ * W: www.ste-pam.com 
+ * 
+ * Teesside University 
+ * Uni ID: K0025970 
+ * 
+ * Created: 15-JAN-2013
  */
 public class InstrumentDetailFragment extends Fragment {
 	/**
@@ -41,11 +53,8 @@ public class InstrumentDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
-			mItem = Data.InstrumentMap.get(getArguments().getString(
-					ARG_ITEM_ID));
+			mItem = Data.InstrumentMap.get(getArguments()
+					.getString(ARG_ITEM_ID));
 		}
 	}
 
@@ -57,10 +66,12 @@ public class InstrumentDetailFragment extends Fragment {
 
 		// Show the dummy content as text in a TextView.
 		if (mItem != null) {
-			((TextView) rootView.findViewById(R.id.instrument_detail))
-					.setText(mItem.strName);
-		}
+			((TextView) rootView.findViewById(R.id.detail_Name)).setText(mItem
+					.getName());
+			((TextView) rootView.findViewById(R.id.detail_description))
+					.setText(mItem.getDescription().toString());
 
+		}
 		return rootView;
 	}
 }

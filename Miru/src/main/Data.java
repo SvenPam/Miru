@@ -12,8 +12,8 @@ import com.google.android.gms.maps.model.Marker;
 
 /**
  * Helper class for providing content for user interfaces.
- *
- * * Final Year Project
+ * 
+ * Final Year Project
  * 
  * @author Stephen Pammenter 
  * E: spammenter@live.com 
@@ -34,7 +34,7 @@ public class Data {
 	 */
 	public static Map<String, Instrument> InstrumentMap = new HashMap<String, Instrument>();
 
-	public Data() {
+	static {
 
 		for (Entry<Marker, Instrument> i : MainActivity.GetInstruments()
 				.entrySet()) {

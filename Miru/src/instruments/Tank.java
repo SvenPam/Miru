@@ -20,10 +20,11 @@ public class Tank extends Instrument {
 	/**
 	 * 
 	 */
-	public Tank(String Name, int ID, LatLng LatLong) {
+	public Tank(String Name, int ID, LatLng LatLong, String Description) {
 		this.strName = Name;
 		this.intID = ID;
 		this.latLng = LatLong;
 		this.intIconID = R.drawable.marker_pin_tank;
+		this.strDescription = Description;
 	}
 }
