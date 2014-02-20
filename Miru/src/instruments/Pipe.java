@@ -21,6 +21,7 @@ public class Pipe extends Instrument implements properties.Flow,
 		properties.Route {
 
 	private List<LatLng> ltLngRoute;
+	private String strRouteID;
 
 	public Pipe(String Name, int ID, LatLng LatLong, String Description,
 			List<LatLng> Route) {
@@ -30,6 +31,7 @@ public class Pipe extends Instrument implements properties.Flow,
 		this.intIconID = R.drawable.marker_pin_pipe;
 		this.strDescription = Description;
 		this.ltLngRoute = Route;
+		this.strRouteID = "-1";
 	}
 
 	@Override
@@ -51,7 +53,14 @@ public class Pipe extends Instrument implements properties.Flow,
 	@Override
 	public void removePoint(LatLng latlng) {
 		ltLngRoute.remove(latlng);
+	}
 
+	public void setRouteID(String ID) {
+		this.strRouteID = ID;
+	}
+
+	public String getRouteID() {
+		return this.strRouteID;
 	}
 
 }

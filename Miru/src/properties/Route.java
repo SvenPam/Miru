@@ -14,4 +14,8 @@ public interface Route {
 
 	public void removePoint(LatLng latlng);
 
+	public void setRouteID(String ID);
+
+	public String getRouteID();
+
 }

@@ -107,6 +107,13 @@ public class SampleData {
 		alInstruments.add(new Pipe("Test Pipe 1", 33, new LatLng(54.58383,
 				-1.101638), "This is a test route.", ltlngList));
 
+		ltlngList.add(new LatLng(54.58380, -1.101638));
+		ltlngList.add(new LatLng(54.580070, -1.098811));
+		ltlngList.add(new LatLng(54.579110, -1.102534));
+		ltlngList.add(new LatLng(54.577150, -1.100661));
+
+		alInstruments.add(new Pipe("Test Pipe 2", 33, new LatLng(54.58383,
+				-1.101638), "This is a test route.", ltlngList));
 	}
 
 	public ArrayList<Instrument> GetInstruments() {

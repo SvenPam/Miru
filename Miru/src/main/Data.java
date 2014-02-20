@@ -30,7 +30,7 @@ public class Data {
 	 */
 	public static List<Instrument> InstrumentList = new ArrayList<Instrument>();
 	/**
-	 * A map of instruments, by ID.
+	 * A map of instruments, by ID. Used by master/details activity.
 	 */
 	public static Map<String, Instrument> InstrumentMap = new HashMap<String, Instrument>();
 
@@ -46,4 +46,5 @@ public class Data {
 		InstrumentList.add(item);
 		InstrumentMap.put(item.GetID().toString(), item);
 	}
+
 }

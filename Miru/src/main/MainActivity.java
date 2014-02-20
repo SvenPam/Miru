@@ -213,6 +213,13 @@ public class MainActivity extends FragmentActivity implements
 				.hasNext();) {
 			Instrument inst = i.next();
 
+			if (inst instanceof Route) {
+
+				((Route) inst).setRouteID(mMap.addPolyline(
+						new PolylineOptions().addAll(((Route) inst).getRoute())
+								.width(3).color(Color.BLUE)).getId());
+
+			}
 			marker = mMap
 					.addMarker(new MarkerOptions()
 							.position(inst.GetLatLng())
@@ -223,34 +230,13 @@ public class MainActivity extends FragmentActivity implements
 									.GetIconID())));
 			mapMarkers.put(marker, inst); // Note: Markers are used as a key,
 											// and the instrument as a value.
-
-			if (inst instanceof Route) {
-
-				mMap.addPolyline(new PolylineOptions()
-						.addAll(((Route) inst).getRoute()).width(3)
-						.color(Color.BLUE));
-			}
 		}
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.Pipe:
-			item.setChecked(!item.isChecked());
-			filterMapMarkers("class instruments.Pipe");
-			return true;
-		case R.id.Flare:
-			item.setChecked(!item.isChecked());
-			filterMapMarkers("class instruments.Flare");
-			return true;
-		case R.id.Tank:
-			item.setChecked(!item.isChecked());
-			filterMapMarkers("class instruments.Tank");
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
+		filterMapMarkers("class instruments." + item.getTitle());
+		return true;
 	}
 
 	/**
@@ -261,6 +247,9 @@ public class MainActivity extends FragmentActivity implements
 			if (i.getValue().getClass().toString().equals(Type)) {
 				if (i.getKey().isVisible()) {
 					i.getKey().setVisible(false);
+					if (i instanceof Route) {
+
+					}
 				} else {
 					i.getKey().setVisible(true);
 				}
