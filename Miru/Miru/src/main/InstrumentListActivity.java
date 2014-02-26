@@ -1,8 +1,6 @@
 package main;
 
 import com.example.miru.R;
-import com.example.miru.R.id;
-import com.example.miru.R.layout;
 
 import android.content.Intent;
 import android.os.Bundle;

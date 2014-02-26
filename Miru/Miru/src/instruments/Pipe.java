@@ -62,5 +62,10 @@ public class Pipe extends Instrument implements properties.Flow,
 	public String getRouteID() {
 		return this.strRouteID;
 	}
+	
+	public String getJSON()
+	{
+		return "\"Pipe\": " + super.getJSON();
+	}
 
 }

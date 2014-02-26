@@ -5,8 +5,15 @@ import instruments.Instrument;
 import instruments.Pipe;
 import instruments.Tank;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import android.util.Xml;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,7 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class SampleData {
 
 	private ArrayList<Instrument> alInstruments;
-
+	 
 	public SampleData() {
 
 		List<LatLng> ltlngList = new ArrayList<LatLng>();
@@ -107,16 +114,15 @@ public class SampleData {
 		alInstruments.add(new Pipe("Test Pipe 1", 33, new LatLng(54.58383,
 				-1.101638), "This is a test route.", ltlngList));
 
-		ltlngList.add(new LatLng(54.58380, -1.101638));
-		ltlngList.add(new LatLng(54.580070, -1.098811));
-		ltlngList.add(new LatLng(54.579110, -1.102534));
-		ltlngList.add(new LatLng(54.577150, -1.100661));
-
-		alInstruments.add(new Pipe("Test Pipe 2", 33, new LatLng(54.58383,
-				-1.101638), "This is a test route.", ltlngList));
 	}
 
 	public ArrayList<Instrument> GetInstruments() {
+		
+		
+		
+		
 		return this.alInstruments;
 	}
+	
+
 }

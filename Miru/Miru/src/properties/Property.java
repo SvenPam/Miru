@@ -10,9 +10,9 @@ package properties;
  * Uni ID: K0025970 
  * Created: 06-DEC-2013
  */
-public abstract class Property extends instruments.Instrument {
+public abstract class Property {
 
 	public Property() {
-		// TODO Auto-generated constructor stub
+		
 	}
 }

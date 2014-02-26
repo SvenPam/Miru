@@ -1,8 +1,6 @@
 package main;
 
 import com.example.miru.R;
-import com.example.miru.R.id;
-import com.example.miru.R.layout;
 
 import instruments.Instrument;
 import android.os.Bundle;
@@ -53,7 +51,7 @@ public class InstrumentDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			mItem = Data.InstrumentMap.get(getArguments()
+			mItem = Data.GetInstrumentMap().get(getArguments()
 					.getString(ARG_ITEM_ID));
 		}
 	}

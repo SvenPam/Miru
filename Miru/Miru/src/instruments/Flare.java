@@ -4,7 +4,7 @@ import com.example.miru.R;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Represents one Tank.
+ * Represents a flare.
  * 
  * @author Stephen Pammenter 
  * E: spammenter@live.com 
@@ -14,17 +14,20 @@ import com.google.android.gms.maps.model.LatLng;
  * Uni ID: K0025970 
  * 
  * Created: 06-DEC-2013
- */
-public class Tank extends Instrument {
+ * */
+public class Flare extends Instrument {
 
-	/**
-	 * 
-	 */
-	public Tank(String Name, int ID, LatLng LatLong, String Description) {
+	public Flare(String Name, int ID, LatLng LatLong, String Description) {
 		this.strName = Name;
 		this.intID = ID;
 		this.latLng = LatLong;
-		this.intIconID = R.drawable.marker_pin_tank;
+		this.intIconID = R.drawable.marker_pin_flare;
 		this.strDescription = Description;
 	}
+	
+	public String getJSON()
+	{
+		return "\"Flare\": " + super.getJSON();
+	}
+
 }

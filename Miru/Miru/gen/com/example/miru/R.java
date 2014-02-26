@@ -8,6 +8,9 @@
 package com.example.miru;
 
 public final class R {
+    public static final class array {
+        public static final int asset_types=0x7f090000;
+    }
     public static final class attr {
         /** 
     The size of the ad. It must be one of BANNER, FULL_BANNER, LEADERBOARD,
@@ -218,17 +221,18 @@ containing a value of this type.
         public static final int ic_plusone_tall_off_client=0x7f02001d;
         public static final int marker_pin_flare=0x7f02001e;
         public static final int marker_pin_pipe=0x7f02001f;
-        public static final int marker_pin_tank=0x7f020020;
+        public static final int marker_pin_pump=0x7f020020;
+        public static final int marker_pin_tank=0x7f020021;
     }
     public static final class id {
-        public static final int Flare=0x7f05000d;
-        public static final int Pipe=0x7f05000c;
-        public static final int Tank=0x7f05000b;
-        public static final int action_filter=0x7f05000a;
-        public static final int action_settings=0x7f05000e;
+        public static final int Flare=0x7f050013;
+        public static final int Pipe=0x7f050012;
+        public static final int Tank=0x7f050011;
+        public static final int action_filter=0x7f050010;
+        public static final int action_settings=0x7f050014;
         public static final int detail_Name=0x7f050008;
         public static final int detail_description=0x7f050009;
-        public static final int group1=0x7f05000f;
+        public static final int group1=0x7f050015;
         public static final int hybrid=0x7f050004;
         public static final int instrument_detail_container=0x7f050005;
         public static final int instrument_list=0x7f050006;
@@ -236,7 +240,13 @@ containing a value of this type.
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
         public static final int satellite=0x7f050002;
+        public static final int spinnerType=0x7f05000b;
+        public static final int switchLocation=0x7f05000a;
         public static final int terrain=0x7f050003;
+        public static final int textView1=0x7f05000c;
+        public static final int txtDesc=0x7f05000e;
+        public static final int txtName=0x7f05000d;
+        public static final int txtRef=0x7f05000f;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f070000;
@@ -262,10 +272,11 @@ containing a value of this type.
         public static final int activity_instrument_twopane=0x7f030002;
         public static final int activity_main=0x7f030003;
         public static final int fragment_instrument_detail=0x7f030004;
+        public static final int geotag_dialogue=0x7f030005;
     }
     public static final class menu {
-        public static final int filter=0x7f0a0000;
-        public static final int main=0x7f0a0001;
+        public static final int filter=0x7f0b0000;
+        public static final int main=0x7f0b0001;
     }
     public static final class string {
         public static final int action_settings=0x7f06001b;
@@ -370,6 +381,7 @@ containing a value of this type.
         public static final int title_activity_fullscreen=0x7f06001d;
         public static final int title_instrument_detail=0x7f060021;
         public static final int title_instrument_list=0x7f060020;
+        public static final int use_my_location_=0x7f060022;
     }
     public static final class style {
         /** 
@@ -396,15 +408,15 @@ containing a value of this type.
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f090000;
+        public static final int AppBaseTheme=0x7f0a0000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f090001;
-        public static final int ButtonBar=0x7f090003;
-        public static final int ButtonBarButton=0x7f090004;
-        public static final int FullscreenActionBarStyle=0x7f090005;
-        public static final int FullscreenTheme=0x7f090002;
+        public static final int AppTheme=0x7f0a0001;
+        public static final int ButtonBar=0x7f0a0003;
+        public static final int ButtonBarButton=0x7f0a0004;
+        public static final int FullscreenActionBarStyle=0x7f0a0005;
+        public static final int FullscreenTheme=0x7f0a0002;
     }
     public static final class styleable {
         /** Attributes that can be used with a AdsAttrs.

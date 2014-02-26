@@ -78,10 +78,9 @@ public class InstrumentListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO: replace with a real list adapter.
 		setListAdapter(new ArrayAdapter<Instrument>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, Data.InstrumentList));
+				android.R.id.text1, Data.GetAssets()));
 	}
 
 	@Override
@@ -124,7 +123,7 @@ public class InstrumentListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(Data.InstrumentList.get(position).intID
+		mCallbacks.onItemSelected(Data.GetAssets().get(position).intID
 				.toString());
 	}
 

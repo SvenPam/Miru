@@ -7,8 +7,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.xml.sax.DTDHandler;
+
 import properties.Route;
 
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -17,6 +23,8 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.VideoView;
 
 import com.example.miru.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -29,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -36,7 +45,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 /**
@@ -55,29 +63,59 @@ import com.google.android.gms.maps.model.PolylineOptions;
  * */
 public class MainActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
-		OnMyLocationButtonClickListener {
+		OnMyLocationButtonClickListener, OnMapLongClickListener {
 	/**Stores the map, map settings and markers*/
-	private GoogleMap mMap;
+	private static GoogleMap mMap;
 	/**Used for location.*/
 	private LocationClient mLocationClient;
 	/**Defines the map overlay.*/
 	private UiSettings mUISettings;
 	/**HashMap of key value pairs, key: marker and value: an instrument. Used between fragments.*/
-	private static Map<Marker, Instrument> mapMarkers;
+	private static  Map<Marker, Instrument> mapMarkers;
 	/**Used to prevent the map re-zooming to user location after initial startup.*/
 	private boolean blnIsReady;
 	/**Stored the ID of the last selected marker.*/
 	public static Integer intSelectedMarker;
+	
 
-	/**All filler, no thriller. DELETE after data implementation*/
-	private SampleData sd;
+	
+	
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		sd = new SampleData();
+		
+		
+		setUpMapIfNeeded();
+		setUpLocationClientIfNeeded();
+		mLocationClient.connect();
+		addMarkersToMap();
+		onMyLocationButtonClick(); // Automatically zoom to users location.
+		// Assign a listener to each marker.
+		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+
+			public void onInfoWindowClick(Marker marker) {			
+				
+				
+			//	dt.writeAssetsToJSON(getApplicationContext());
+			//	dt.readJSONToAssets(getApplicationContext());
+				
+				if (mapMarkers != null && marker != null)
+				{
+					Instrument i = mapMarkers.get(marker);
+					intSelectedMarker = i.GetID();
+				}
+							
+				Intent intent = new Intent(MainActivity.this, InstrumentListActivity.class);
+				startActivity(intent);
+			}
+			
+		});
+		  mMap.setOnMapLongClickListener(this);	
+		
 	}
 
 	/**
@@ -95,24 +133,12 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setUpMapIfNeeded();
-		setUpLocationClientIfNeeded();
-		mLocationClient.connect();
+		
 		addMarkersToMap();
-		onMyLocationButtonClick(); // Automatically zoom to users location.
-		// Assign a listener to each marker.
-		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
-
-			public void onInfoWindowClick(Marker marker) {
-				intSelectedMarker = mapMarkers.get(marker).GetID();
-				Intent intent = new Intent(MainActivity.this,
-						InstrumentListActivity.class);
-				startActivity(intent);
-
-			}
-
-		});
+	
 	}
+
+	
 
 	@Override
 	public void onPause() {
@@ -153,7 +179,13 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onDisconnected() {
-		// Do nothing
+		//dt.writeAssetsToJSON(getApplicationContext());
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		//writeAssetsToJSON(getApplicationContext());
 	}
 
 	/**
@@ -164,6 +196,9 @@ public class MainActivity extends FragmentActivity implements
 		// Do nothing
 	}
 
+	
+	
+	
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
@@ -201,15 +236,44 @@ public class MainActivity extends FragmentActivity implements
 	public boolean onMyLocationButtonClick() {
 		return false;
 	}
+	
+	@Override
+	public void onMapLongClick(LatLng ltlng) {
+		
+		double dblLat;
+		double dblLng;
+		LatLng ltlngCurrentPosi;
+		
+		//If no location, this avoids naughty NullPointerException.
+		if(mLocationClient.getLastLocation() != null)
+		{
+			 dblLat = mLocationClient.getLastLocation().getLatitude();
+			 dblLng = mLocationClient.getLastLocation().getLatitude();
+			 ltlngCurrentPosi = new LatLng(dblLat, dblLng);
+			
+		}
+		else
+		{
+			 ltlngCurrentPosi = null;
+		}
+		
+		DialogFragment newFragment = new GeoTagDialogue(ltlngCurrentPosi, ltlng);
+		
+ 	    newFragment.show(getFragmentManager(), "GeoTag");
+ 	    		
+	}
+	
 
-	private void addMarkersToMap() {
+
+	public static void addMarkersToMap() {
 
 		// First iterate through available instruments, and assign an individual
 		// marker to each instrument.
-		mapMarkers = new HashMap<Marker, Instrument>();
-		Marker marker;
+		mapMarkers = null;
+		Marker marker;		
 
-		for (Iterator<Instrument> i = sd.GetInstruments().iterator(); i
+		mapMarkers = new HashMap<Marker, Instrument>();
+		for (Iterator<Instrument> i = Data.GetAssets().iterator(); i
 				.hasNext();) {
 			Instrument inst = i.next();
 
@@ -258,7 +322,5 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	public static Map<Marker, Instrument> GetInstruments() {
-		return MainActivity.mapMarkers;
-	}
+
 }

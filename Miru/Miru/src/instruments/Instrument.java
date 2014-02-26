@@ -16,13 +16,23 @@ import com.google.android.gms.maps.model.LatLng;
  * */
 public abstract class Instrument {
 
+	/**For use in JSON*/
+	public String strThisClass;
 	public String strName;
 	public Integer intID;
 	public LatLng latLng;
 	public int intIconID;
 	public String strDescription;
 
-	// public Image imgInstrumentIcon
+	
+	
+	public String getThisClass() {
+		return strThisClass;
+	}
+
+	public void setThisClass(String strThisClass) {
+		this.strThisClass = strThisClass;
+	}
 
 	public String getName() {
 		return strName;
@@ -51,8 +61,22 @@ public abstract class Instrument {
 	public String getDescription() {
 		return this.strDescription;
 	}
-
-	@Override
+	
+	public String getJSON()
+	{
+	String strJSON;
+		
+		strJSON = "{";
+		strJSON += "\"ID\": \"" + this.intID.toString() +  "\",";
+		strJSON += "\"Name\": \"" + this.strName +  "\",";
+		strJSON += "\"Description\": \"" + this.strDescription +  "\",";
+		strJSON += "\"Lat\": \"" + this.latLng.latitude +  "\",";
+		strJSON += "\"Long\": \"" + this.latLng.longitude +  "\"";
+		strJSON += "}";
+		return strJSON;
+		
+	}
+	
 	public String toString() {
 		return this.strName;
 	}
