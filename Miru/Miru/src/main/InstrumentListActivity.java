@@ -40,9 +40,7 @@ public class InstrumentListActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_instrument_list);
-		// Show the Up button in the action bar.
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		
 		if (findViewById(R.id.instrument_detail_container) != null) {
 			// The detail container view will be present only in the
 			// large-screen layouts (res/values-large and
@@ -56,8 +54,15 @@ public class InstrumentListActivity extends FragmentActivity implements
 					.findFragmentById(R.id.instrument_list))
 					.setActivateOnItemClick(true);
 		}
-
-		onItemSelected(MainActivity.intSelectedMarker.toString());
+		try
+		{
+			onItemSelected(MainActivity.intSelectedMarker.toString());
+		}
+		catch(NullPointerException e)
+		{
+			e.printStackTrace();
+		}
+		
 	}
 
 	@Override
@@ -71,7 +76,7 @@ public class InstrumentListActivity extends FragmentActivity implements
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			NavUtils.navigateUpFromSameTask(this);
+			this.finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

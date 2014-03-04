@@ -23,6 +23,12 @@
             android:title="Flare"
             android:checkable="true"
             android:checked="true" />
+             <item
+            android:id="@+id/Pump"
+            android:icon="@drawable/marker_pin_pump"
+            android:title="Pump"
+            android:checkable="true"
+            android:checked="true" />
     </menu>
           </item>
 </menu>

@@ -225,34 +225,40 @@ containing a value of this type.
         public static final int marker_pin_tank=0x7f020021;
     }
     public static final class id {
-        public static final int Flare=0x7f050013;
-        public static final int Pipe=0x7f050012;
-        public static final int Tank=0x7f050011;
-        public static final int action_filter=0x7f050010;
-        public static final int action_settings=0x7f050014;
-        public static final int detail_Name=0x7f050008;
-        public static final int detail_description=0x7f050009;
-        public static final int group1=0x7f050015;
+        public static final int Flare=0x7f050017;
+        public static final int Pipe=0x7f050016;
+        public static final int Pump=0x7f050018;
+        public static final int Tank=0x7f050015;
+        public static final int action_filter=0x7f050014;
+        public static final int action_settings=0x7f050019;
+        public static final int detail_Name=0x7f05000c;
+        public static final int detail_description=0x7f05000d;
+        public static final int fullscreen_content=0x7f050005;
+        public static final int fullscreen_content_camera=0x7f050006;
+        public static final int fullscreen_content_controls=0x7f050008;
+        public static final int fullscreen_content_overlay=0x7f050007;
+        public static final int group1=0x7f05001a;
         public static final int hybrid=0x7f050004;
-        public static final int instrument_detail_container=0x7f050005;
-        public static final int instrument_list=0x7f050006;
-        public static final int map=0x7f050007;
+        public static final int instrument_detail_container=0x7f050009;
+        public static final int instrument_list=0x7f05000a;
+        public static final int map=0x7f05000b;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
         public static final int satellite=0x7f050002;
-        public static final int spinnerType=0x7f05000b;
-        public static final int switchLocation=0x7f05000a;
+        public static final int spinnerType=0x7f05000f;
+        public static final int switchLocation=0x7f05000e;
         public static final int terrain=0x7f050003;
-        public static final int textView1=0x7f05000c;
-        public static final int txtDesc=0x7f05000e;
-        public static final int txtName=0x7f05000d;
-        public static final int txtRef=0x7f05000f;
+        public static final int textView1=0x7f050010;
+        public static final int txtDesc=0x7f050012;
+        public static final int txtName=0x7f050011;
+        public static final int txtRef=0x7f050013;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f070000;
     }
     public static final class layout {
-        public static final int activity_instrument_detail=0x7f030000;
+        public static final int activity_camera=0x7f030000;
+        public static final int activity_instrument_detail=0x7f030001;
         /** 
     Layout alias to replace the single-pane version of the layout with a
     two-pane version on Large screens.
@@ -268,11 +274,11 @@ containing a value of this type.
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     
          */
-        public static final int activity_instrument_list=0x7f030001;
-        public static final int activity_instrument_twopane=0x7f030002;
-        public static final int activity_main=0x7f030003;
-        public static final int fragment_instrument_detail=0x7f030004;
-        public static final int geotag_dialogue=0x7f030005;
+        public static final int activity_instrument_list=0x7f030002;
+        public static final int activity_instrument_twopane=0x7f030003;
+        public static final int activity_main=0x7f030004;
+        public static final int fragment_instrument_detail=0x7f030005;
+        public static final int geotag_dialogue=0x7f030006;
     }
     public static final class menu {
         public static final int filter=0x7f0b0000;
@@ -378,6 +384,7 @@ containing a value of this type.
         public static final int dummy_button=0x7f06001e;
         public static final int dummy_content=0x7f06001f;
         public static final int hello_world=0x7f06001c;
+        public static final int title_activity_camera=0x7f060023;
         public static final int title_activity_fullscreen=0x7f06001d;
         public static final int title_instrument_detail=0x7f060021;
         public static final int title_instrument_list=0x7f060020;

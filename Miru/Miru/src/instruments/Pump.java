@@ -16,12 +16,20 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class Pump extends Instrument {
 
-	public Pump(String Name, int ID, LatLng LatLong, String Description) {
+	public Pump(String Name, int ID, LatLng LatLong, String Description, String Ref) {
 			this.strName = Name;
 			this.intID = ID;
 			this.latLng = LatLong;
 			this.intIconID = R.drawable.marker_pin_pump;
 			this.strDescription = Description;
+			if (Ref != null)
+			{
+				this.strRef = Ref;
+			}
+			else
+			{
+				this.strRef = "";
+			}
 		}
 		public String getJSON()
 		{

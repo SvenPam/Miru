@@ -2,20 +2,16 @@ package main;
 
 import instruments.Instrument;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.xml.sax.DTDHandler;
-
 import properties.Route;
-
-import android.app.Activity;
 import android.app.DialogFragment;
-import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -23,8 +19,6 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.VideoView;
 
 import com.example.miru.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -48,74 +42,48 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 /**
- * The main activity for the Miru which intiliazes the app. 
+ * The main activity for the Miru which intiliazes the app.
  * 
  * Final Year Project
  * 
- * @author Stephen Pammenter 
- * E: spammenter@live.com 
- * W: www.ste-pam.com 
+ * @author Stephen Pammenter E: spammenter@live.com W: www.ste-pam.com
  * 
- * Teesside University 
- * Uni ID: K0025970 
+ *         Teesside University Uni ID: K0025970
  * 
- * Created: 10-DEC-2013
+ *         Created: 10-DEC-2013
  * */
 public class MainActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
 		OnMyLocationButtonClickListener, OnMapLongClickListener {
-	/**Stores the map, map settings and markers*/
+	/** Stores the map, map settings and markers */
 	private static GoogleMap mMap;
-	/**Used for location.*/
+	/** Used for location. */
 	private LocationClient mLocationClient;
-	/**Defines the map overlay.*/
+	/** Defines the map overlay. */
 	private UiSettings mUISettings;
-	/**HashMap of key value pairs, key: marker and value: an instrument. Used between fragments.*/
-	private static  Map<Marker, Instrument> mapMarkers;
-	/**Used to prevent the map re-zooming to user location after initial startup.*/
+	private static final LocationRequest REQUEST = LocationRequest.create()
+			.setInterval(5000) // 5 seconds
+			.setFastestInterval(16) // 16ms = 60fps
+			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+	/**
+	 * HashMap of key value pairs, key: marker and value: an instrument. Used
+	 * between fragments.
+	 */
+	private static Map<Marker, Instrument> mapMarkers;
+	/**
+	 * Used to prevent the map re-zooming to user location after initial
+	 * startup.
+	 */
 	private boolean blnIsReady;
-	/**Stored the ID of the last selected marker.*/
+	/** Stored the ID of the last selected marker. */
 	public static Integer intSelectedMarker;
-	
-
-	
-	
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
-		
-		
-		setUpMapIfNeeded();
-		setUpLocationClientIfNeeded();
-		mLocationClient.connect();
-		addMarkersToMap();
-		onMyLocationButtonClick(); // Automatically zoom to users location.
-		// Assign a listener to each marker.
-		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
-
-			public void onInfoWindowClick(Marker marker) {			
-				
-				
-			//	dt.writeAssetsToJSON(getApplicationContext());
-			//	dt.readJSONToAssets(getApplicationContext());
-				
-				if (mapMarkers != null && marker != null)
-				{
-					Instrument i = mapMarkers.get(marker);
-					intSelectedMarker = i.GetID();
-				}
-							
-				Intent intent = new Intent(MainActivity.this, InstrumentListActivity.class);
-				startActivity(intent);
-			}
-			
-		});
-		  mMap.setOnMapLongClickListener(this);	
-		
 	}
 
 	/**
@@ -133,12 +101,42 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		addMarkersToMap();
-	
-	}
 
-	
+		setUpMapIfNeeded();
+		setUpLocationClientIfNeeded();
+		mLocationClient.connect();
+		onMyLocationButtonClick(); // Automatically zoom to users location.
+		// Assign a listener to each marker.
+		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+
+			public void onInfoWindowClick(Marker marker) {
+
+				// dt.writeAssetsToJSON(getApplicationContext());
+				// dt.readJSONToAssets(getApplicationContext());
+
+				if (mapMarkers != null && marker != null) {
+					try {
+						Instrument i = mapMarkers.get(marker);
+						intSelectedMarker = i.GetID();
+					} catch (Exception e) {
+						// Seriously have no idea why this occasionally happens.
+					}
+				}
+
+				try {
+					Intent intent = new Intent(MainActivity.this,
+							InstrumentListActivity.class);
+					startActivity(intent);
+				} catch (NullPointerException e) {
+
+				}
+			}
+
+		});
+		mMap.setOnMapLongClickListener(this);
+		addMarkersToMap();
+
+	}
 
 	@Override
 	public void onPause() {
@@ -179,13 +177,27 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onDisconnected() {
-		//dt.writeAssetsToJSON(getApplicationContext());
+		// dt.writeAssetsToJSON(getApplicationContext());
+		try {
+			Data.simpleWriteObjectsToFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	@Override
-	public void onDestroy()
-	{
-		//writeAssetsToJSON(getApplicationContext());
+	public void onDestroy() {
+		super.onDestroy();
+		try {
+			Data.simpleWriteObjectsToFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		// writeAssetsToJSON(getApplicationContext());
 	}
 
 	/**
@@ -195,14 +207,6 @@ public class MainActivity extends FragmentActivity implements
 	public void onConnectionFailed(ConnectionResult result) {
 		// Do nothing
 	}
-
-	
-	
-	
-	private static final LocationRequest REQUEST = LocationRequest.create()
-			.setInterval(5000) // 5 seconds
-			.setFastestInterval(16) // 16ms = 60fps
-			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 	private void setUpMapIfNeeded() {
 		// Do a null check to confirm that we have not already instantiated the
@@ -236,45 +240,40 @@ public class MainActivity extends FragmentActivity implements
 	public boolean onMyLocationButtonClick() {
 		return false;
 	}
-	
+
 	@Override
 	public void onMapLongClick(LatLng ltlng) {
-		
+
 		double dblLat;
 		double dblLng;
 		LatLng ltlngCurrentPosi;
-		
-		//If no location, this avoids naughty NullPointerException.
-		if(mLocationClient.getLastLocation() != null)
-		{
-			 dblLat = mLocationClient.getLastLocation().getLatitude();
-			 dblLng = mLocationClient.getLastLocation().getLatitude();
-			 ltlngCurrentPosi = new LatLng(dblLat, dblLng);
-			
-		}
-		else
-		{
-			 ltlngCurrentPosi = null;
-		}
-		
-		DialogFragment newFragment = new GeoTagDialogue(ltlngCurrentPosi, ltlng);
-		
- 	    newFragment.show(getFragmentManager(), "GeoTag");
- 	    		
-	}
-	
 
+		// If no location, this avoids a naughty NullPointerException.
+		if (mLocationClient.getLastLocation() != null) {
+			dblLat = mLocationClient.getLastLocation().getLatitude();
+			dblLng = mLocationClient.getLastLocation().getLongitude();
+			ltlngCurrentPosi = new LatLng(dblLat, dblLng);
+		} else {
+			ltlngCurrentPosi = null;
+		}
+
+		DialogFragment newFragment = new GeoTagDialogue(ltlngCurrentPosi,
+				ltlng, null, null, null);
+
+		newFragment.show(getFragmentManager(), "GeoTag");
+
+	}
 
 	public static void addMarkersToMap() {
 
 		// First iterate through available instruments, and assign an individual
 		// marker to each instrument.
 		mapMarkers = null;
-		Marker marker;		
+		Marker marker;
+		mMap.clear();
 
 		mapMarkers = new HashMap<Marker, Instrument>();
-		for (Iterator<Instrument> i = Data.GetAssets().iterator(); i
-				.hasNext();) {
+		for (Iterator<Instrument> i = Data.GetAssets().iterator(); i.hasNext();) {
 			Instrument inst = i.next();
 
 			if (inst instanceof Route) {
@@ -300,6 +299,10 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		filterMapMarkers("class instruments." + item.getTitle());
+		item.setChecked(!item.isChecked());
+
+		Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+		this.startActivity(intent);
 		return true;
 	}
 
@@ -321,6 +324,5 @@ public class MainActivity extends FragmentActivity implements
 			}
 		}
 	}
-
 
 }

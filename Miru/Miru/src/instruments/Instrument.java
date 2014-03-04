@@ -23,6 +23,8 @@ public abstract class Instrument {
 	public LatLng latLng;
 	public int intIconID;
 	public String strDescription;
+	/**Most likely a temp value to store SAP ref so we can store a bank of geodata then automate the detail creation process.*/
+	public String strRef;
 
 	
 	
@@ -76,9 +78,19 @@ public abstract class Instrument {
 		return strJSON;
 		
 	}
+		public String getStrRef() {
+		return strRef;
+	}
+
+	public void setStrRef(String strRef) {
+		this.strRef = strRef;
+	}
 	
 	public String toString() {
 		return this.strName;
 	}
+
+
+	
 
 }

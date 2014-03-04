@@ -1,14 +1,15 @@
 package main;
 
-import instruments.Instrument;
-import instruments.Pump;
-import instruments.Tank;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import instruments.*;
+
 
 import com.example.miru.R;
 import com.example.miru.R.layout;
 import com.google.android.gms.maps.model.LatLng;
 
-import android.animation.AnimatorSet.Builder;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,11 +38,18 @@ public class GeoTagDialogue  extends DialogFragment {
 	
 	private LatLng ltlngDevice;
 	private LatLng ltlngPressed;
+	private String strName;
+	private String strDescription;
+	private String strRef;
 	
-	@SuppressLint("ValidFragment")
-	public GeoTagDialogue(LatLng DevicePosi, LatLng PressedPosi) {
+	
+
+	public GeoTagDialogue(LatLng DevicePosi, LatLng PressedPosi, String Name, String Description, String Ref) {
 		this.ltlngDevice = DevicePosi;
 		this.ltlngPressed = PressedPosi;
+		this.strName = Name;
+		this.strDescription = Description;
+		this.strRef = Ref;
 	}
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -52,6 +60,8 @@ public class GeoTagDialogue  extends DialogFragment {
 
         final View view = (View) inflater.inflate(R.layout.geotag_dialogue, null);
         
+        EditText txt;
+        
         
         
         if (ltlngDevice == null)
@@ -61,6 +71,23 @@ public class GeoTagDialogue  extends DialogFragment {
         	swt.setChecked(false);
         	swt.setEnabled(false);
         }
+        
+        if(strName != null)
+        {
+        	txt = (EditText) view.findViewById(R.id.txtName);
+        	txt.setText(strName);
+        }
+        if(strDescription != null)
+        {
+        	txt = (EditText) view.findViewById(R.id.txtName);
+        	txt.setText(strName);
+        }
+        if(strRef != null)
+        {
+        	txt = (EditText) view.findViewById(R.id.txtName);
+        	txt.setText(strName);
+        }
+        
         
         builder.setView(view);
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {			       	
@@ -93,8 +120,24 @@ public class GeoTagDialogue  extends DialogFragment {
 				{
 					latlng = ltlngPressed;
 				}
-				Instrument pump = new Pump(strName, 40, latlng, strDesc);
-				Data.AddAsset(pump);
+				
+				Instrument inst  = null;
+				
+				//Because Java 1.6 does not support case statements for strings, we have to use a bunch of if's...
+				if (strType.equals("Pump"))
+				{
+					inst = new Pump(strName, -1, latlng, strDesc, strRef);
+				}
+				else if (strType.equals("Tank"))
+				{
+					inst = new Tank(strName, -1, latlng, strDesc, strRef);
+				}
+				else if (strType.equals("Flare"))
+				{
+					inst = new Flare(strName, -1, latlng, strDesc, strRef);
+				}
+				
+				Data.AddAsset(inst);
 				MainActivity.addMarkersToMap();
 				
 			}
@@ -112,4 +155,7 @@ public class GeoTagDialogue  extends DialogFragment {
         
         return builder.create();
     }
+    
+   
+    
 }

@@ -10,11 +10,13 @@
     <string name="title_instrument_list">Instruments</string>
     <string name="title_instrument_detail">Instrument Detail</string>
     <string name="use_my_location_">Use My Location?</string>
+
     <string-array name="asset_types">
-        <item >Tank</item>
-        <item >Pipe</item>
-        <item >Flare</item>
-        <item >Pump</item>
+        <item>Tank</item>
+        <item>Flare</item>
+        <item>Pump</item>
     </string-array>
+
+    <string name="title_activity_camera">CameraActivity</string>
 
 </resources>

@@ -23,14 +23,20 @@ public class Pipe extends Instrument implements properties.Flow,
 	private List<LatLng> ltLngRoute;
 	private String strRouteID;
 
-	public Pipe(String Name, int ID, LatLng LatLong, String Description,
-			List<LatLng> Route) {
+	public Pipe(String Name, int ID, LatLng LatLong, String Description, String Ref) {
 		this.strName = Name;
 		this.intID = ID;
 		this.latLng = LatLong;
 		this.intIconID = R.drawable.marker_pin_pipe;
 		this.strDescription = Description;
-		this.ltLngRoute = Route;
+		if (Ref != null)
+		{
+			this.strRef = Ref;
+		}
+		else
+		{
+			this.strRef = "";
+		}
 		this.strRouteID = "-1";
 	}
 

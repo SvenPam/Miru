@@ -6,11 +6,14 @@ import instruments.Pipe;
 import instruments.Tank;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,7 +98,10 @@ public class Data {
 	
 	public static void AddAsset(Instrument inst)
 	{
-		alInstruments.add(inst);		
+		if (inst != null)
+		{
+			alInstruments.add(inst);
+		}
 	}
 	
 	public void writeAssetsToJSON(Context context)
@@ -148,6 +154,46 @@ public class Data {
 	    }
 		    
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public static void simpleReadObjectsFromFile() throws IOException
+	{
+		ObjectInputStream oos = null;
+		
+		try
+		{
+		    FileInputStream fout = new FileInputStream("Data.mir");
+	        oos = new ObjectInputStream(fout);
+	        alInstruments =  (ArrayList<Instrument>) oos.readObject();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			oos.close();
+		}
+	}
+	
+	public static void simpleWriteObjectsToFile() throws IOException
+	{
+		ObjectOutputStream oos = null;
+		
+		try
+		{
+		    FileOutputStream fout = new FileOutputStream("Data.mir");
+	        oos = new ObjectOutputStream(fout);
+	        oos.writeObject(GetAssets());	
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			oos.close();
+		}
+	}
 	
 }
