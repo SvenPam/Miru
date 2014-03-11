@@ -2,13 +2,13 @@ package main;
 
 import com.example.miru.R;
 
-import instruments.Instrument;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import assets.Asset;
 
 /**
  * A fragment representing a single Instrument detail screen.
@@ -37,7 +37,7 @@ public class InstrumentDetailFragment extends Fragment {
 	/**
 	 * The dummy content this fragment is presenting.
 	 */
-	private Instrument mItem;
+	private Asset mItem;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the

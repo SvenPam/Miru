@@ -1,4 +1,4 @@
-package instruments;
+package assets;
 
 import com.example.miru.R;
 import com.google.android.gms.maps.model.LatLng;
@@ -14,13 +14,13 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  * Created: 26-FEB-2013
  */
-public class Pump extends Instrument {
+public class Pump extends Asset {
 
 	public Pump(String Name, int ID, LatLng LatLong, String Description, String Ref) {
-			this.strName = Name;
-			this.intID = ID;
+			this.name = Name;
+			this.id = ID;
 			this.latLng = LatLong;
-			this.intIconID = R.drawable.marker_pin_pump;
+			this.iconID = R.drawable.marker_pin_pump;
 			this.strDescription = Description;
 			if (Ref != null)
 			{

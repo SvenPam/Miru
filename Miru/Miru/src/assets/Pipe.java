@@ -1,4 +1,4 @@
-package instruments;
+package assets;
 
 import java.util.List;
 
@@ -17,17 +17,17 @@ import com.google.android.gms.maps.model.LatLng;
 * 
 * Created: 06-DEC-2013
 */
-public class Pipe extends Instrument implements properties.Flow,
+public class Pipe extends Asset implements properties.Flow,
 		properties.Route {
 
 	private List<LatLng> ltLngRoute;
 	private String strRouteID;
 
 	public Pipe(String Name, int ID, LatLng LatLong, String Description, String Ref) {
-		this.strName = Name;
-		this.intID = ID;
+		this.name = Name;
+		this.id = ID;
 		this.latLng = LatLong;
-		this.intIconID = R.drawable.marker_pin_pipe;
+		this.iconID = R.drawable.marker_pin_pipe;
 		this.strDescription = Description;
 		if (Ref != null)
 		{

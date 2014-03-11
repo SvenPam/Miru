@@ -1,7 +1,5 @@
 package main;
 
-import instruments.Instrument;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,11 +17,13 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import assets.Asset;
 
 import com.example.miru.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -33,9 +33,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,7 +48,9 @@ import com.google.android.gms.maps.model.PolylineOptions;
  * 
  * Final Year Project
  * 
- * @author Stephen Pammenter E: spammenter@live.com W: www.ste-pam.com
+ * @author Stephen Pammenter
+ * 
+ *         E: spammenter@live.com W: www.ste-pam.com
  * 
  *         Teesside University Uni ID: K0025970
  * 
@@ -69,7 +73,7 @@ public class MainActivity extends FragmentActivity implements
 	 * HashMap of key value pairs, key: marker and value: an instrument. Used
 	 * between fragments.
 	 */
-	private static Map<Marker, Instrument> mapMarkers;
+	private static Map<Marker, Asset> mapMarkers;
 	/**
 	 * Used to prevent the map re-zooming to user location after initial
 	 * startup.
@@ -77,6 +81,12 @@ public class MainActivity extends FragmentActivity implements
 	private boolean blnIsReady;
 	/** Stored the ID of the last selected marker. */
 	public static Integer intSelectedMarker;
+
+	/**
+	 * Used to store the map details, when orientation changes prevents us
+	 * losing settings.
+	 */
+	private CameraPosition cp;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +116,11 @@ public class MainActivity extends FragmentActivity implements
 		setUpLocationClientIfNeeded();
 		mLocationClient.connect();
 		onMyLocationButtonClick(); // Automatically zoom to users location.
+		if (cp != null) {
+			mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
+			cp = null;
+		}
+
 		// Assign a listener to each marker.
 		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
@@ -116,8 +131,8 @@ public class MainActivity extends FragmentActivity implements
 
 				if (mapMarkers != null && marker != null) {
 					try {
-						Instrument i = mapMarkers.get(marker);
-						intSelectedMarker = i.GetID();
+						Asset i = mapMarkers.get(marker);
+						intSelectedMarker = i.getID();
 					} catch (Exception e) {
 						// Seriously have no idea why this occasionally happens.
 					}
@@ -135,7 +150,6 @@ public class MainActivity extends FragmentActivity implements
 		});
 		mMap.setOnMapLongClickListener(this);
 		addMarkersToMap();
-
 	}
 
 	@Override
@@ -144,6 +158,8 @@ public class MainActivity extends FragmentActivity implements
 		if (mLocationClient != null) {
 			mLocationClient.disconnect();
 		}
+		cp = mMap.getCameraPosition();
+		mMap = null;
 	}
 
 	/**
@@ -209,6 +225,11 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	private void setUpMapIfNeeded() {
+		//Used to reintilize the map after an event which triggers the destruction of the current fragment.
+		try {
+			MapsInitializer.initialize(getApplication());
+		} catch (GooglePlayServicesNotAvailableException e) {
+		}
 		// Do a null check to confirm that we have not already instantiated the
 		// map.
 		if (mMap == null) {
@@ -224,7 +245,6 @@ public class MainActivity extends FragmentActivity implements
 				mMap.setMapType(4); // Hybrid map.
 				mUISettings = mMap.getUiSettings();
 				mUISettings.setCompassEnabled(true);
-
 			}
 		}
 	}
@@ -244,11 +264,11 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onMapLongClick(LatLng ltlng) {
 
-		double dblLat;
-		double dblLng;
 		LatLng ltlngCurrentPosi;
 
-		// If no location, this avoids a naughty NullPointerException.
+		double dblLat;
+		double dblLng;
+
 		if (mLocationClient.getLastLocation() != null) {
 			dblLat = mLocationClient.getLastLocation().getLatitude();
 			dblLng = mLocationClient.getLastLocation().getLongitude();
@@ -264,6 +284,10 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
+	/**
+	 * Removes exisiting markers from map, builds a freshh set and adds them
+	 * again.
+	 */
 	public static void addMarkersToMap() {
 
 		// First iterate through available instruments, and assign an individual
@@ -272,9 +296,9 @@ public class MainActivity extends FragmentActivity implements
 		Marker marker;
 		mMap.clear();
 
-		mapMarkers = new HashMap<Marker, Instrument>();
-		for (Iterator<Instrument> i = Data.GetAssets().iterator(); i.hasNext();) {
-			Instrument inst = i.next();
+		mapMarkers = new HashMap<Marker, Asset>();
+		for (Iterator<Asset> i = Data.GetAssets().iterator(); i.hasNext();) {
+			Asset inst = i.next();
 
 			if (inst instanceof Route) {
 
@@ -285,12 +309,12 @@ public class MainActivity extends FragmentActivity implements
 			}
 			marker = mMap
 					.addMarker(new MarkerOptions()
-							.position(inst.GetLatLng())
+							.position(inst.getLatLng())
 							.title(inst.getName())
 							.snippet(
 									"We need to decide what we want in this Info box.")
 							.icon(BitmapDescriptorFactory.fromResource(inst
-									.GetIconID())));
+									.getIconID())));
 			mapMarkers.put(marker, inst); // Note: Markers are used as a key,
 											// and the instrument as a value.
 		}
@@ -301,7 +325,7 @@ public class MainActivity extends FragmentActivity implements
 		filterMapMarkers("class instruments." + item.getTitle());
 		item.setChecked(!item.isChecked());
 
-		Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+		Intent intent = new Intent(MainActivity.this, main.ARActivity.class);
 		this.startActivity(intent);
 		return true;
 	}
@@ -310,7 +334,7 @@ public class MainActivity extends FragmentActivity implements
 	 * Toggles visibility of specified marker type.
 	 * */
 	private void filterMapMarkers(String Type) {
-		for (Entry<Marker, Instrument> i : mapMarkers.entrySet()) {
+		for (Entry<Marker, Asset> i : mapMarkers.entrySet()) {
 			if (i.getValue().getClass().toString().equals(Type)) {
 				if (i.getKey().isVisible()) {
 					i.getKey().setVisible(false);

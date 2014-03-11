@@ -16,6 +16,7 @@
     <!-- My Location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -67,7 +68,33 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="main.MainActivity" />
-        </activity>      
+        </activity>
+        <activity
+            android:name="main.CameraActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_camera"
+            android:parentActivityName="main.MainActivity"
+            android:theme="@style/FullscreenTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="main.MainActivity" />
+        </activity>
+        <activity
+            android:name="main.SurfaceViewOverlay"
+            android:label="@string/title_activity_surface_view_overlay"
+            android:parentActivityName="main.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="main.MainActivity" />
+        </activity>
+        <activity
+            android:name="main.ARActivity"
+            android:label="@string/title_activity_ar"
+            android:parentActivityName="main.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="main.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

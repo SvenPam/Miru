@@ -18,5 +18,8 @@
     </string-array>
 
     <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_ar">ARActivity</string>
+    <string name="title_activity_surface_overlay">SurfaceOverlay</string>
+    <string name="title_activity_surface_view_overlay">SurfaceViewOverlay</string>
 
 </resources>

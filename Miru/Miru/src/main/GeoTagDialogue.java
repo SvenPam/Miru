@@ -3,7 +3,6 @@ package main;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import instruments.*;
 
 
 import com.example.miru.R;
@@ -21,6 +20,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
+import assets.*;
 /**
  * Provides functions to geotag new instruments.
  * 
@@ -63,7 +63,7 @@ public class GeoTagDialogue  extends DialogFragment {
         EditText txt;
         
         
-        
+        //Lock switch if device location is not present.
         if (ltlngDevice == null)
         {
         	
@@ -121,7 +121,7 @@ public class GeoTagDialogue  extends DialogFragment {
 					latlng = ltlngPressed;
 				}
 				
-				Instrument inst  = null;
+				Asset inst  = null;
 				
 				//Because Java 1.6 does not support case statements for strings, we have to use a bunch of if's...
 				if (strType.equals("Pump"))
