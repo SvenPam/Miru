@@ -10,7 +10,7 @@ The Application
 
 Currently, the project is very much in alpha stage, having mainly been built to satisfy my thesis. 
 
-The application comes in two main parts:
+The application comes in three main parts:
 
 * 2D Aerial Map
 * Detail View
