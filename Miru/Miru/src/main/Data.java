@@ -1,6 +1,5 @@
 package main;
 
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,8 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 import assets.Asset;
 
@@ -39,7 +40,7 @@ public class Data {
 	private Gson gson = new Gson();
 
 	static SampleData sd = new SampleData();
-	private static ArrayList<Asset> alInstruments = sd.GetInstruments();
+	private static ArrayList<Asset> assets = sd.GetInstruments();
 
 	/**
 	 * A map of instruments, by ID. Used by master/details activity.
@@ -53,7 +54,7 @@ public class Data {
 	 * */
 	public static Map<String, Asset> GetInstrumentMap() {
 
-		for (Iterator<Asset> i = alInstruments.iterator(); i.hasNext();) {
+		for (Iterator<Asset> i = assets.iterator(); i.hasNext();) {
 			addItem(i.next());
 
 		}
@@ -77,8 +78,25 @@ public class Data {
 	 * @return The most up to date objects.
 	 */
 	public static ArrayList<Asset> GetAssets() {
-		SampleData sd = new SampleData();
-		return alInstruments;
+		return assets;
+	}
+
+	/**
+	 * Returns assets with distance from passed location.
+	 * 
+	 * @param Location
+	 *            to determine distance from
+	 * @returns TreeMap of key value pairs, where the key is the distance.
+	 */
+	public static Map<Float, Asset> GetAssets(Location loc) {
+		Map<Float, Asset> assetsWithDistance = new TreeMap<Float, Asset>();
+		for (Iterator<Asset> i = assets.iterator(); i.hasNext();) {
+			Asset inst = i.next();
+
+			assetsWithDistance.put(loc.distanceTo(inst.getLocation()), inst);
+		}
+
+		return assetsWithDistance;
 	}
 
 	/**
@@ -89,7 +107,7 @@ public class Data {
 	 * */
 	public static void AddAsset(Asset inst) {
 		if (inst != null) {
-			alInstruments.add(inst);
+			assets.add(inst);
 		}
 	}
 
@@ -167,7 +185,7 @@ public class Data {
 		try {
 			FileInputStream fout = new FileInputStream("Data.mir");
 			oos = new ObjectInputStream(fout);
-			alInstruments = (ArrayList<Asset>) oos.readObject();
+			assets = (ArrayList<Asset>) oos.readObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

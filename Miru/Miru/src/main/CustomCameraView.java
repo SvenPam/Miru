@@ -24,8 +24,8 @@ import android.view.WindowManager;
  * */
 public class CustomCameraView extends SurfaceView {
 
-	Camera camera;
-	SurfaceHolder previewHolder;
+	private Camera camera;
+	private SurfaceHolder previewHolder;
 
 	public CustomCameraView(Context context) {
 		super(context);

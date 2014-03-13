@@ -81,7 +81,6 @@ public class MainActivity extends FragmentActivity implements
 	private boolean blnIsReady;
 	/** Stored the ID of the last selected marker. */
 	public static Integer intSelectedMarker;
-
 	/**
 	 * Used to store the map details, when orientation changes prevents us
 	 * losing settings.

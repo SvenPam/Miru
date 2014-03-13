@@ -5,7 +5,7 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * A simple instrument.
+ * A simple asset.
  * 
  * @author Stephen Pammenter
  * 
