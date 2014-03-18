@@ -1,31 +1,27 @@
 package main;
 
-import com.example.miru.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
+import com.example.miru.R;
+
 /**
- * An activity representing a list of Instruments. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link InstrumentDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- *
+ * An activity representing a list of Instruments. This activity has different
+ * presentations for handset and tablet-size devices. On handsets, the activity
+ * presents a list of items, which when touched, lead to a
+ * {@link InstrumentDetailActivity} representing item details. On tablets, the
+ * activity presents the list of items and item details side-by-side using two
+ * vertical panes.
+ * 
  * Final Year Project
  * 
- * @author Stephen Pammenter 
- * E: spammenter@live.com 
- * W: www.ste-pam.com 
+ * @author Stephen Pammenter E: spammenter@live.com W: www.ste-pam.com
  * 
- * Teesside University 
- * Uni ID: K0025970 
+ *         Teesside University Uni ID: K0025970
  * 
- * Created: 15-JAN-2013
+ *         Created: 15-JAN-2013
  */
 public class InstrumentListActivity extends FragmentActivity implements
 		InstrumentListFragment.Callbacks {
@@ -40,7 +36,7 @@ public class InstrumentListActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_instrument_list);
-		
+
 		if (findViewById(R.id.instrument_detail_container) != null) {
 			// The detail container view will be present only in the
 			// large-screen layouts (res/values-large and
@@ -54,15 +50,12 @@ public class InstrumentListActivity extends FragmentActivity implements
 					.findFragmentById(R.id.instrument_list))
 					.setActivateOnItemClick(true);
 		}
-		try
-		{
-			onItemSelected(MainActivity.intSelectedMarker.toString());
-		}
-		catch(NullPointerException e)
-		{
+		try {
+			onItemSelected(MainActivity.sSelectedMarker.toString());
+		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
@@ -83,8 +76,8 @@ public class InstrumentListActivity extends FragmentActivity implements
 	}
 
 	/**
-	 * Callback method from {@link InstrumentListFragment.Callbacks}
-	 * indicating that the item with the given ID was selected.
+	 * Callback method from {@link InstrumentListFragment.Callbacks} indicating
+	 * that the item with the given ID was selected.
 	 */
 	@Override
 	public void onItemSelected(String id) {

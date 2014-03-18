@@ -246,9 +246,9 @@ containing a value of this type.
         public static final int switchLocation=0x7f05000b;
         public static final int terrain=0x7f050003;
         public static final int textView1=0x7f05000d;
-        public static final int txtDesc=0x7f05000f;
+        public static final int txtDesc=0x7f050010;
         public static final int txtName=0x7f05000e;
-        public static final int txtRef=0x7f050010;
+        public static final int txtRef=0x7f05000f;
     }
     public static final class integer {
         public static final int google_play_services_version=0x7f070000;

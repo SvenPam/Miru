@@ -6,35 +6,30 @@ import com.example.miru.R;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
-* Represents a simple pipe.
-* 
-* @author Stephen Pammenter 
-* E: spammenter@live.com 
-* W: www.ste-pam.com 
-* 
-* Teesside University 
-* Uni ID: K0025970 
-* 
-* Created: 06-DEC-2013
-*/
-public class Pipe extends Asset implements properties.Flow,
-		properties.Route {
+ * Represents a simple pipe.
+ * 
+ * @author Stephen Pammenter E: spammenter@live.com W: www.ste-pam.com
+ * 
+ *         Teesside University Uni ID: K0025970
+ * 
+ *         Created: 06-DEC-2013
+ */
+public class Pipe extends Asset implements properties.Flow, properties.Route {
 
 	private List<LatLng> ltLngRoute;
 	private String strRouteID;
 
-	public Pipe(String Name, int ID, LatLng LatLong, String Description, String Ref) {
+	public Pipe(String Name, int ID, double Lat, double Lng,
+			String Description, String Ref) {
 		this.name = Name;
 		this.id = ID;
-		this.latLng = LatLong;
+		this.lat = Lat;
+		this.lng = Lng;
 		this.iconID = R.drawable.marker_pin_pipe;
 		this.strDescription = Description;
-		if (Ref != null)
-		{
+		if (Ref != null) {
 			this.strRef = Ref;
-		}
-		else
-		{
+		} else {
 			this.strRef = "";
 		}
 		this.strRouteID = "-1";
@@ -68,9 +63,8 @@ public class Pipe extends Asset implements properties.Flow,
 	public String getRouteID() {
 		return this.strRouteID;
 	}
-	
-	public String getJSON()
-	{
+
+	public String getJSON() {
 		return "\"Pipe\": " + super.getJSON();
 	}
 

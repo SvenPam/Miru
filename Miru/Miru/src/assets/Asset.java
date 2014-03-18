@@ -19,12 +19,17 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  *         Created: 06-DEC-2013
  * */
-public abstract class Asset {
+public abstract class Asset implements java.io.Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/** For use in JSON */
 	public String name;
 	public Integer id;
-	public LatLng latLng;
+	public double lat;
+	public double lng;
 	public int iconID;
 	public String strDescription;
 	/**
@@ -49,8 +54,13 @@ public abstract class Asset {
 		this.id = intID;
 	}
 
+	public void setLatLng() {
+
+	}
+
 	public LatLng getLatLng() {
-		return this.latLng;
+		LatLng latlng = new LatLng(this.lat, this.lng);
+		return latlng;
 	}
 
 	/**
@@ -59,9 +69,9 @@ public abstract class Asset {
 	 * @return Location of current asset.
 	 */
 	public Location getLocation() {
-		Location loc = new Location(this.latLng.toString());
-		loc.setLatitude(this.latLng.latitude);
-		loc.setLongitude(this.latLng.longitude);
+		Location loc = new Location("");
+		loc.setLatitude(this.lat);
+		loc.setLongitude(this.lng);
 		return loc;
 	}
 
@@ -80,8 +90,8 @@ public abstract class Asset {
 		strJSON += "\"ID\": \"" + this.id.toString() + "\",";
 		strJSON += "\"Name\": \"" + this.name + "\",";
 		strJSON += "\"Description\": \"" + this.strDescription + "\",";
-		strJSON += "\"Lat\": \"" + this.latLng.latitude + "\",";
-		strJSON += "\"Long\": \"" + this.latLng.longitude + "\"";
+		strJSON += "\"Lat\": \"" + this.lat + "\",";
+		strJSON += "\"Long\": \"" + this.lng + "\"";
 		strJSON += "}";
 		return strJSON;
 

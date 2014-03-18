@@ -11,12 +11,17 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 import assets.Asset;
 
 import com.example.miru.R;
@@ -58,11 +63,12 @@ import com.google.android.gms.maps.model.PolylineOptions;
  * */
 public class MainActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
-		OnMyLocationButtonClickListener, OnMapLongClickListener {
+		OnMyLocationButtonClickListener, OnMapLongClickListener,
+		SensorEventListener {
 	/** Stores the map, map settings and markers */
-	private static GoogleMap mMap;
+	private static GoogleMap sMap;
 	/** Used for location. */
-	private LocationClient mLocationClient;
+	private static LocationClient sLocationClient;
 	/** Defines the map overlay. */
 	private UiSettings mUISettings;
 	private static final LocationRequest REQUEST = LocationRequest.create()
@@ -73,19 +79,22 @@ public class MainActivity extends FragmentActivity implements
 	 * HashMap of key value pairs, key: marker and value: an instrument. Used
 	 * between fragments.
 	 */
-	private static Map<Marker, Asset> mapMarkers;
+	private static Map<Marker, Asset> sMapMarkers;
 	/**
 	 * Used to prevent the map re-zooming to user location after initial
 	 * startup.
 	 */
-	private boolean blnIsReady;
+	private boolean mIsReady;
 	/** Stored the ID of the last selected marker. */
-	public static Integer intSelectedMarker;
+	public static Integer sSelectedMarker;
 	/**
 	 * Used to store the map details, when orientation changes prevents us
 	 * losing settings.
 	 */
-	private CameraPosition cp;
+	private CameraPosition mCameraPosition;
+	private SensorManager mSensorManager;
+	private float[] mAccelerometerValues = new float[3];
+	public static boolean sliftDetected = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,52 +122,78 @@ public class MainActivity extends FragmentActivity implements
 
 		setUpMapIfNeeded();
 		setUpLocationClientIfNeeded();
-		mLocationClient.connect();
+		sLocationClient.connect();
+
 		onMyLocationButtonClick(); // Automatically zoom to users location.
-		if (cp != null) {
-			mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cp));
-			cp = null;
+		if (mCameraPosition != null) {
+			sMap.moveCamera(CameraUpdateFactory
+					.newCameraPosition(mCameraPosition));
+			mCameraPosition = null;
 		}
 
-		// Assign a listener to each marker.
-		mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+		try {
+			Data.simpleReadObjectsFromFile(getApplicationContext());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if (Data.getAssets() != null) {
+			// Assign a listener to each marker.
+			sMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
 
-			public void onInfoWindowClick(Marker marker) {
+				public void onInfoWindowClick(Marker marker) {
 
-				// dt.writeAssetsToJSON(getApplicationContext());
-				// dt.readJSONToAssets(getApplicationContext());
-
-				if (mapMarkers != null && marker != null) {
 					try {
-						Asset i = mapMarkers.get(marker);
-						intSelectedMarker = i.getID();
-					} catch (Exception e) {
-						// Seriously have no idea why this occasionally happens.
+						Data.simpleWriteObjectsToFile(getApplicationContext());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					if (sMapMarkers != null && marker != null) {
+						try {
+							Asset i = sMapMarkers.get(marker);
+							sSelectedMarker = i.getID();
+						} catch (Exception e) {
+							// Seriously have no idea why this occasionally happens.
+						}
+					}
+
+					try {
+						Intent intent = new Intent(MainActivity.this,
+								InstrumentListActivity.class);
+						startActivity(intent);
+					} catch (NullPointerException e) {
+
 					}
 				}
 
-				try {
-					Intent intent = new Intent(MainActivity.this,
-							InstrumentListActivity.class);
-					startActivity(intent);
-				} catch (NullPointerException e) {
+			});
+			addMarkersToMap();
 
-				}
-			}
+		} else {
+			Toast.makeText(getApplication(), "Data could not be found.",
+					Toast.LENGTH_LONG).show();
 
-		});
-		mMap.setOnMapLongClickListener(this);
-		addMarkersToMap();
+		}
+		sMap.setOnMapLongClickListener(this);
+
+		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		mSensorManager.registerListener(this,
+				mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+				1000000000);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		if (mLocationClient != null) {
-			mLocationClient.disconnect();
+		try {
+			Data.simpleWriteObjectsToFile(getApplicationContext());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		cp = mMap.getCameraPosition();
-		mMap = null;
+		if (sLocationClient != null) {
+			sLocationClient.disconnect();
+		}
+		mCameraPosition = sMap.getCameraPosition();
+		sMap = null;
 	}
 
 	/**
@@ -166,13 +201,13 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onLocationChanged(Location location) {
-		if (!blnIsReady) {
+		if (!mIsReady) {
 			LatLng latLng = new LatLng(location.getLatitude(),
 					location.getLongitude());
 			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
 					latLng, 17);
-			mMap.animateCamera(cameraUpdate);
-			blnIsReady = true;
+			sMap.animateCamera(cameraUpdate);
+			mIsReady = true;
 		}
 
 	}
@@ -183,7 +218,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onConnected(Bundle connectionHint) {
-		mLocationClient.requestLocationUpdates(REQUEST, this); // LocationListener
+		sLocationClient.requestLocationUpdates(REQUEST, this); // LocationListener
 	}
 
 	/**
@@ -192,9 +227,8 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	@Override
 	public void onDisconnected() {
-		// dt.writeAssetsToJSON(getApplicationContext());
 		try {
-			Data.simpleWriteObjectsToFile();
+			Data.simpleWriteObjectsToFile(getApplicationContext());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
@@ -206,7 +240,7 @@ public class MainActivity extends FragmentActivity implements
 	public void onDestroy() {
 		super.onDestroy();
 		try {
-			Data.simpleWriteObjectsToFile();
+			Data.simpleWriteObjectsToFile(getApplicationContext());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
@@ -231,26 +265,26 @@ public class MainActivity extends FragmentActivity implements
 		}
 		// Do a null check to confirm that we have not already instantiated the
 		// map.
-		if (mMap == null) {
+		if (sMap == null) {
 			// Try to obtain the map from the wSupportMapFragment.
-			mMap = ((SupportMapFragment) getSupportFragmentManager()
+			sMap = ((SupportMapFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.map)).getMap();
 			// Check if we were successful in obtaining the map.
-			if (mMap != null) {
-				mMap.setMyLocationEnabled(true); // Show user location.
-				mMap.setOnMyLocationButtonClickListener(this); // Adds the
+			if (sMap != null) {
+				sMap.setMyLocationEnabled(true); // Show user location.
+				sMap.setOnMyLocationButtonClickListener(this); // Adds the
 																// "zoom to me"
 																// button.
-				mMap.setMapType(4); // Hybrid map.
-				mUISettings = mMap.getUiSettings();
+				sMap.setMapType(4); // Hybrid map.
+				mUISettings = sMap.getUiSettings();
 				mUISettings.setCompassEnabled(true);
 			}
 		}
 	}
 
 	private void setUpLocationClientIfNeeded() {
-		if (mLocationClient == null) {
-			mLocationClient = new LocationClient(getApplicationContext(), this, // ConnectionCallbacks
+		if (sLocationClient == null) {
+			sLocationClient = new LocationClient(getApplicationContext(), this, // ConnectionCallbacks
 					this); // OnConnectionFailedListener
 		}
 	}
@@ -261,52 +295,51 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onMapLongClick(LatLng ltlng) {
+	public void onMapLongClick(LatLng Ltlng) {
 
-		LatLng ltlngCurrentPosi;
+		LatLng currentPosi;
 
-		double dblLat;
-		double dblLng;
+		double lat;
+		double lng;
 
-		if (mLocationClient.getLastLocation() != null) {
-			dblLat = mLocationClient.getLastLocation().getLatitude();
-			dblLng = mLocationClient.getLastLocation().getLongitude();
-			ltlngCurrentPosi = new LatLng(dblLat, dblLng);
+		if (sLocationClient.getLastLocation() != null) {
+			lat = sLocationClient.getLastLocation().getLatitude();
+			lng = sLocationClient.getLastLocation().getLongitude();
+			currentPosi = new LatLng(lat, lng);
 		} else {
-			ltlngCurrentPosi = null;
+			currentPosi = null;
 		}
 
-		DialogFragment newFragment = new GeoTagDialogue(ltlngCurrentPosi,
-				ltlng, null, null, null);
+		DialogFragment newFragment = new GeoTagDialogue(currentPosi, Ltlng,
+				null, null, null);
 
 		newFragment.show(getFragmentManager(), "GeoTag");
 
 	}
 
 	/**
-	 * Removes exisiting markers from map, builds a freshh set and adds them
+	 * Removes existing markers from map, builds a fresh set and adds them
 	 * again.
 	 */
 	public static void addMarkersToMap() {
 
 		// First iterate through available instruments, and assign an individual
 		// marker to each instrument.
-		mapMarkers = null;
+		sMapMarkers = null;
 		Marker marker;
-		mMap.clear();
-
-		mapMarkers = new HashMap<Marker, Asset>();
-		for (Iterator<Asset> i = Data.GetAssets().iterator(); i.hasNext();) {
+		sMap.clear();
+		sMapMarkers = new HashMap<Marker, Asset>();
+		for (Iterator<Asset> i = Data.getAssets().iterator(); i.hasNext();) {
 			Asset inst = i.next();
 
 			if (inst instanceof Route) {
 
-				((Route) inst).setRouteID(mMap.addPolyline(
+				((Route) inst).setRouteID(sMap.addPolyline(
 						new PolylineOptions().addAll(((Route) inst).getRoute())
 								.width(3).color(Color.BLUE)).getId());
 
 			}
-			marker = mMap
+			marker = sMap
 					.addMarker(new MarkerOptions()
 							.position(inst.getLatLng())
 							.title(inst.getName())
@@ -314,7 +347,7 @@ public class MainActivity extends FragmentActivity implements
 									"We need to decide what we want in this Info box.")
 							.icon(BitmapDescriptorFactory.fromResource(inst
 									.getIconID())));
-			mapMarkers.put(marker, inst); // Note: Markers are used as a key,
+			sMapMarkers.put(marker, inst); // Note: Markers are used as a key,
 											// and the instrument as a value.
 		}
 	}
@@ -323,9 +356,6 @@ public class MainActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		filterMapMarkers("class instruments." + item.getTitle());
 		item.setChecked(!item.isChecked());
-
-		Intent intent = new Intent(MainActivity.this, main.ARActivity.class);
-		this.startActivity(intent);
 		return true;
 	}
 
@@ -333,19 +363,53 @@ public class MainActivity extends FragmentActivity implements
 	 * Toggles visibility of specified marker type.
 	 * */
 	private void filterMapMarkers(String Type) {
-		for (Entry<Marker, Asset> i : mapMarkers.entrySet()) {
-			if (i.getValue().getClass().toString().equals(Type)) {
-				if (i.getKey().isVisible()) {
-					i.getKey().setVisible(false);
-					if (i instanceof Route) {
+		try {
+			for (Entry<Marker, Asset> i : sMapMarkers.entrySet()) {
+				if (i.getValue().getClass().toString().equals(Type)) {
+					if (i.getKey().isVisible()) {
+						i.getKey().setVisible(false);
+						if (i instanceof Route) {
 
+						}
+					} else {
+						i.getKey().setVisible(true);
 					}
-				} else {
-					i.getKey().setVisible(true);
-				}
 
+				}
+			}
+		} catch (NullPointerException e) {
+			Toast.makeText(getApplicationContext(),
+					"Data has not been correctly loaded, restart app.",
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			mAccelerometerValues = event.values;
+			System.out.println("x: " + mAccelerometerValues[0] + " | y:"
+					+ mAccelerometerValues[1] + " | z:"
+					+ mAccelerometerValues[2]);
+			//Device has been lifted up.
+			if ((mAccelerometerValues[0] < -6 || mAccelerometerValues[0] > 6)
+					&& mAccelerometerValues[2] < 7 && !sliftDetected) {
+				Intent intent = new Intent(MainActivity.this,
+						main.ARActivity.class);
+				this.startActivity(intent);
+				sliftDetected = true;
 			}
 		}
+
+	}
+
+	public static Location getLastKnownLocation() {
+		return sLocationClient.getLastLocation();
 	}
 
 }

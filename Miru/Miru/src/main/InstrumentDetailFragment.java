@@ -1,7 +1,5 @@
 package main;
 
-import com.example.miru.R;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,22 +8,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import assets.Asset;
 
+import com.example.miru.R;
+
 /**
- * A fragment representing a single Instrument detail screen.
- * This fragment is either contained in a {@link InstrumentListActivity}
- * in two-pane mode (on tablets) or a {@link InstrumentDetailActivity}
- * on handsets.
- *
+ * A fragment representing a single Instrument detail screen. This fragment is
+ * either contained in a {@link InstrumentListActivity} in two-pane mode (on
+ * tablets) or a {@link InstrumentDetailActivity} on handsets.
+ * 
  * Final Year Project
  * 
- * @author Stephen Pammenter 
- * E: spammenter@live.com 
- * W: www.ste-pam.com 
+ * @author Stephen Pammenter E: spammenter@live.com W: www.ste-pam.com
  * 
- * Teesside University 
- * Uni ID: K0025970 
+ *         Teesside University Uni ID: K0025970
  * 
- * Created: 15-JAN-2013
+ *         Created: 15-JAN-2013
  */
 public class InstrumentDetailFragment extends Fragment {
 	/**
@@ -51,8 +47,8 @@ public class InstrumentDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			mItem = Data.GetInstrumentMap().get(getArguments()
-					.getString(ARG_ITEM_ID));
+			mItem = Data.getAssetMap().get(
+					getArguments().getString(ARG_ITEM_ID));
 		}
 	}
 

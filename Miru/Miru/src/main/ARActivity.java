@@ -1,14 +1,17 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,6 +20,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,18 +41,40 @@ public class ARActivity extends Activity {
 	private SensorManager mSensorManager;
 	private AREngine mView;
 	/** Sensor.TYPE_MAGNETIC_FIELD values */
-	private float[] mValues;
+	private float[] mMagneticValues;
 	/** Sensor.TYPE_ACCELEROMETER values. */
-	private float[] aValues = new float[3];
-	private float deviceHeading;
+	private float[] mAccelerometerValues = new float[3];
+	private float mdeviceHeading;
+	/* Stores x y cords of canvas artifacts. ID | left | top | right | bottom* */
+	private ArrayList<int[]> mArtefactLocations;
+	/** If camera API cannot provide us with FOV, we use this. */
+	private double mDefaultFOV = 120;
+	/** Field of View - what the 'camera' can see. */
+	private double mFieldOfView = mDefaultFOV;
 
 	private final SensorEventListener mListener = new SensorEventListener() {
+
 		public void onSensorChanged(SensorEvent event) {
-			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-				aValues = event.values;
-			if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-				mValues = event.values;
+			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+				mAccelerometerValues = event.values;
+				//Device has been lifted up.
+				if ((mAccelerometerValues[0] > -3 && mAccelerometerValues[0] < 3)
+						&& mAccelerometerValues[2] > 10) {
+					finish();
+				}
+			}
+			if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+				mMagneticValues = event.values;
+			}
 			if (mView != null) {
+				//Sets the FOV if we haven't already.
+				if (mFieldOfView == mDefaultFOV || mFieldOfView != mFieldOfView) {
+					try {
+						mFieldOfView = CustomCameraView.getFOV();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 				mView.invalidate();
 			}
 			updateOrientation(calculateOrientation());
@@ -61,7 +87,7 @@ public class ARActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
-
+		MainActivity.sliftDetected = false;
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		updateOrientation(new float[] { 0, 0, 0 });
 		mView = new AREngine(this);
@@ -77,7 +103,7 @@ public class ARActivity extends Activity {
 
 	private void updateOrientation(float[] values) {
 		if (values != null) {
-			deviceHeading = values[0];
+			mdeviceHeading = values[0];
 		}
 	}
 
@@ -87,7 +113,8 @@ public class ARActivity extends Activity {
 		float[] outR = new float[9];
 
 		try {
-			SensorManager.getRotationMatrix(R, null, aValues, mValues);
+			SensorManager.getRotationMatrix(R, null, mAccelerometerValues,
+					mMagneticValues);
 			SensorManager.remapCoordinateSystem(R, SensorManager.AXIS_X,
 					SensorManager.AXIS_Z, outR);
 
@@ -108,16 +135,15 @@ public class ARActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		Sensor accelerometer = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		Sensor magField = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 		mSensorManager.registerListener(mListener, accelerometer,
-				SensorManager.SENSOR_DELAY_NORMAL);
+				SensorManager.SENSOR_DELAY_UI);
 		mSensorManager.registerListener(mListener, magField,
-				SensorManager.SENSOR_DELAY_NORMAL);
+				SensorManager.SENSOR_DELAY_UI);
 	}
 
 	@Override
@@ -141,8 +167,6 @@ public class ARActivity extends Activity {
 		protected void onDraw(Canvas canvas) {
 			Paint paint = mPaint;
 			Location assetLocation;
-			/** Field of View - what the 'camera' can see. */
-			double fieldOfView = 120;
 			/** Multiplier is used scale heading into the screen width. */
 			double multiplier;
 			/** Determines the limits of our FOV in degrees. */
@@ -154,7 +178,10 @@ public class ARActivity extends Activity {
 			/** Used to determine the max amount of assets shown on Screen. */
 			int maxArtefacts = 30;
 			int yPosi = 30;
+			int left = 0, top = 0, right = 0, bottom = 0;
+			int[] coords = new int[5];
 
+			mArtefactLocations = new ArrayList<int[]>();
 			canvas.drawColor(Color.TRANSPARENT);
 
 			// Get device location.
@@ -169,12 +196,12 @@ public class ARActivity extends Activity {
 			int w = canvas.getWidth();
 
 			// Set our constants.
-			multiplier = w / fieldOfView;
-			lowerLimit = deviceHeading - (fieldOfView / 2);
-			upperLimit = deviceHeading + (fieldOfView / 2);
+			multiplier = w / mFieldOfView;
+			lowerLimit = mdeviceHeading - (mFieldOfView / 2);
+			upperLimit = mdeviceHeading + (mFieldOfView / 2);
 
 			if (deviceLoc != null && count <= maxArtefacts) {
-				TreeMap tm = (TreeMap) Data.GetAssets(deviceLoc);
+				TreeMap tm = (TreeMap) Data.getAssets(deviceLoc);
 				Iterator i = tm.entrySet().iterator();
 				while (i.hasNext()) {
 					Entry entry = (Entry) i.next();
@@ -184,7 +211,6 @@ public class ARActivity extends Activity {
 					assetLocation = asset.getLocation();
 
 					// Set headings.
-					assetHeading = 0;
 					assetHeading = deviceLoc.bearingTo(assetLocation);
 
 					// Set up canvas.
@@ -194,14 +220,27 @@ public class ARActivity extends Activity {
 
 					// If the asset is visible, it goes in our bounds.
 					if (assetHeading > lowerLimit && assetHeading < upperLimit) {
-						fltPoint = (float) (multiplier * ((fieldOfView / 2) + (assetHeading - deviceHeading)));
-						canvas.drawRect(fltPoint - 60, yPosi, fltPoint + 60,
-								yPosi + 30, paint);
+						fltPoint = (float) (multiplier * ((mFieldOfView / 2) + (assetHeading - mdeviceHeading)));
+
+						left = Math.round(fltPoint) - 60;
+						top = yPosi;
+						right = Math.round(fltPoint) + 60;
+						bottom = yPosi + 30;
+
+						canvas.drawRect(left, top, right, bottom, paint);
 						paint.setColor(Color.WHITE);
 						canvas.drawText(asset.getName(), fltPoint - 50,
 								yPosi + 10, paint);
 						canvas.drawText(deviceLoc.distanceTo(assetLocation)
 								+ "m", fltPoint - 5, yPosi + 25, paint);
+
+						//Store position of artifact for listener use.
+						coords[0] = asset.getID();
+						coords[1] = left;
+						coords[2] = top;
+						coords[3] = right;
+						coords[4] = bottom;
+						mArtefactLocations.add(coords);
 
 						//If an image wants adding:
 						//Bitmap largeIcon = BitmapFactory.decodeResource(
@@ -225,7 +264,9 @@ public class ARActivity extends Activity {
 				canvas.drawText("Cannot find Location.", 100, 200, paint);
 			}
 
-			canvas.drawText(String.valueOf(deviceHeading), 10, 600, paint);
+			canvas.drawText("x: " + mAccelerometerValues[0] + " | y:"
+					+ mAccelerometerValues[1] + " | z:"
+					+ mAccelerometerValues[2], 10, 600, paint);
 		}
 
 		@Override
@@ -237,6 +278,37 @@ public class ARActivity extends Activity {
 		protected void onDetachedFromWindow() {
 			super.onDetachedFromWindow();
 		}
+
+		@Override
+		public boolean onTouchEvent(final MotionEvent ev) {
+			switch (ev.getAction()) {
+			case MotionEvent.ACTION_DOWN: {
+				int posX = Math.round(ev.getX());
+				int posY = Math.round(ev.getY());
+				int id = 0;
+				int left = 0, top = 0, right = 0, bottom = 0;
+
+				for (int[] coords : mArtefactLocations) {
+					id = coords[0];
+					left = coords[1];
+					top = coords[2];
+					right = coords[3];
+					bottom = coords[1];
+					Rect r = new Rect(left, top, right, bottom);
+					if (r.contains(posX, posY)) {
+						MainActivity.sSelectedMarker = id;
+						Intent intent = new Intent(ARActivity.this,
+								InstrumentListActivity.class);
+						startActivity(intent);
+						break;
+					}
+				}
+				break;
+			}
+			}
+			return true;
+		}
+
 	}
 }
 

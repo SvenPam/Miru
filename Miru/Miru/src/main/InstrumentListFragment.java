@@ -8,23 +8,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import assets.Asset;
 
-
 /**
- * A list fragment representing a list of Instruments. This fragment
- * also supports tablet devices by allowing list items to be given an
- * 'activated' state upon selection. This helps indicate which item is
- * currently being viewed in a {@link InstrumentDetailFragment}.
- *
+ * A list fragment representing a list of Instruments. This fragment also
+ * supports tablet devices by allowing list items to be given an 'activated'
+ * state upon selection. This helps indicate which item is currently being
+ * viewed in a {@link InstrumentDetailFragment}.
+ * 
  * Final Year Project
  * 
- * @author Stephen Pammenter 
- * E: spammenter@live.com 
- * W: www.ste-pam.com 
+ * @author Stephen Pammenter E: spammenter@live.com W: www.ste-pam.com
  * 
- * Teesside University 
- * Uni ID: K0025970 
+ *         Teesside University Uni ID: K0025970
  * 
- * Created: 15-JAN-2013
+ *         Created: 15-JAN-2013
  */
 public class InstrumentListFragment extends ListFragment {
 
@@ -80,7 +76,7 @@ public class InstrumentListFragment extends ListFragment {
 
 		setListAdapter(new ArrayAdapter<Asset>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, Data.GetAssets()));
+				android.R.id.text1, Data.getAssets()));
 	}
 
 	@Override
@@ -123,8 +119,7 @@ public class InstrumentListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(Data.GetAssets().get(position).id
-				.toString());
+		mCallbacks.onItemSelected(Data.getAssets().get(position).id.toString());
 	}
 
 	@Override

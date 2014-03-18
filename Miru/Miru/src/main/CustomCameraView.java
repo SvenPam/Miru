@@ -24,7 +24,7 @@ import android.view.WindowManager;
  * */
 public class CustomCameraView extends SurfaceView {
 
-	private Camera camera;
+	private static Camera camera;
 	private SurfaceHolder previewHolder;
 
 	public CustomCameraView(Context context) {
@@ -33,13 +33,18 @@ public class CustomCameraView extends SurfaceView {
 		previewHolder = this.getHolder();
 		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		previewHolder.addCallback(surfaceHolderListener);
+
+	}
+
+	public static float getFOV() {
+		return camera.getParameters().getVerticalViewAngle();
 	}
 
 	SurfaceHolder.Callback surfaceHolderListener = new SurfaceHolder.Callback() {
 		public void surfaceCreated(SurfaceHolder holder) {
-			camera = Camera.open(0);
 
 			try {
+				camera = Camera.open(0);
 				camera.setPreviewDisplay(previewHolder);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -78,20 +83,18 @@ public class CustomCameraView extends SurfaceView {
 			camera.startPreview();
 		}
 
-		private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
+		private Size getOptimalPreviewSize(List<Size> sizes, int Width,
+				int Height) {
 			final double ASPECT_TOLERANCE = 0.05;
-			double targetRatio = (double) w / h;
-			if (sizes == null)
-				return null;
-
+			double targetRatio = (double) Width / Height;
+			double ratio;
 			Size optimalSize = null;
 			double minDiff = Double.MAX_VALUE;
+			int targetHeight = Height;
 
-			int targetHeight = h;
-
-			// Try to find an size match aspect ratio and size
+			// Attempt to find a size matching ratio and size.
 			for (Size size : sizes) {
-				double ratio = (double) size.width / size.height;
+				ratio = (double) size.width / size.height;
 				if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
 					continue;
 				if (Math.abs(size.height - targetHeight) < minDiff) {
@@ -99,9 +102,6 @@ public class CustomCameraView extends SurfaceView {
 					minDiff = Math.abs(size.height - targetHeight);
 				}
 			}
-
-			// Cannot find the one match the aspect ratio, ignore the
-			// requirement
 			if (optimalSize == null) {
 				minDiff = Double.MAX_VALUE;
 				for (Size size : sizes) {

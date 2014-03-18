@@ -1,7 +1,6 @@
 package assets;
 
 import com.example.miru.R;
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Represents a flare.
@@ -14,11 +13,12 @@ import com.google.android.gms.maps.model.LatLng;
  * */
 public class Flare extends Asset {
 
-	public Flare(String Name, int ID, LatLng LatLong, String Description,
-			String Ref) {
+	public Flare(String Name, int ID, double Lat, double Lng,
+			String Description, String Ref) {
 		this.name = Name;
 		this.id = ID;
-		this.latLng = LatLong;
+		this.lat = Lat;
+		this.lng = Lng;
 		this.iconID = R.drawable.marker_pin_flare;
 		this.strDescription = Description;
 		if (Ref != null) {

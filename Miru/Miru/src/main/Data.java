@@ -1,7 +1,6 @@
 package main;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,29 +36,24 @@ import com.google.gson.Gson;
  */
 public class Data {
 
-	private Gson gson = new Gson();
-
-	static SampleData sd = new SampleData();
-	private static ArrayList<Asset> assets = sd.GetInstruments();
-
-	/**
-	 * A map of instruments, by ID. Used by master/details activity.
-	 */
-	private static Map<String, Asset> InstrumentMap = new HashMap<String, Asset>();
+	private Gson mGSON = new Gson();
+	/** The main collection of assets used through out application. */
+	private static ArrayList<Asset> sAssets = new ArrayList<Asset>();
+	/** A map of instruments, by ID. Used by master/details activity. */
+	private static Map<String, Asset> sInstrumentMap = new HashMap<String, Asset>();
 
 	/**
 	 * Used in the detail master view, returns Map of instruments.
 	 * 
 	 * @return String Instrument pair.
 	 * */
-	public static Map<String, Asset> GetInstrumentMap() {
+	public static Map<String, Asset> getAssetMap() {
 
-		for (Iterator<Asset> i = assets.iterator(); i.hasNext();) {
+		for (Iterator<Asset> i = sAssets.iterator(); i.hasNext();) {
 			addItem(i.next());
 
 		}
-
-		return InstrumentMap;
+		return sInstrumentMap;
 	}
 
 	/**
@@ -69,7 +63,7 @@ public class Data {
 	 *            The instrument to be added.
 	 **/
 	private static void addItem(Asset item) {
-		InstrumentMap.put(item.getID().toString(), item);
+		sInstrumentMap.put(item.getID().toString(), item);
 	}
 
 	/**
@@ -77,8 +71,8 @@ public class Data {
 	 * 
 	 * @return The most up to date objects.
 	 */
-	public static ArrayList<Asset> GetAssets() {
-		return assets;
+	public static ArrayList<Asset> getAssets() {
+		return sAssets;
 	}
 
 	/**
@@ -88,11 +82,10 @@ public class Data {
 	 *            to determine distance from
 	 * @returns TreeMap of key value pairs, where the key is the distance.
 	 */
-	public static Map<Float, Asset> GetAssets(Location loc) {
+	public static Map<Float, Asset> getAssets(Location loc) {
 		Map<Float, Asset> assetsWithDistance = new TreeMap<Float, Asset>();
-		for (Iterator<Asset> i = assets.iterator(); i.hasNext();) {
+		for (Iterator<Asset> i = sAssets.iterator(); i.hasNext();) {
 			Asset inst = i.next();
-
 			assetsWithDistance.put(loc.distanceTo(inst.getLocation()), inst);
 		}
 
@@ -105,9 +98,9 @@ public class Data {
 	 * @param The
 	 *            instrument to be added.
 	 * */
-	public static void AddAsset(Asset inst) {
+	public static void addAsset(Asset inst) {
 		if (inst != null) {
-			assets.add(inst);
+			sAssets.add(inst);
 		}
 	}
 
@@ -119,9 +112,8 @@ public class Data {
 	 */
 	public void writeAssetsToJSON(Context context) {
 		String strJSON = "";
-		SampleData sd = new SampleData();
 
-		strJSON = gson.toJson(sd.GetInstruments(), Asset.class);
+		strJSON = mGSON.toJson(sAssets, Asset.class);
 
 		FileOutputStream outputStream;
 
@@ -160,7 +152,7 @@ public class Data {
 				// JsonArray array =
 				// parser.parse(bufferedReader).getAsJsonArray();
 
-				Asset event = gson.fromJson(bufferedReader, Asset.class);
+				Asset event = mGSON.fromJson(bufferedReader, Asset.class);
 
 				System.out.print(event.getDescription());
 
@@ -179,34 +171,42 @@ public class Data {
 	/**
 	 * Read objects from local file into main collection of instruments.
 	 */
-	public static void simpleReadObjectsFromFile() throws IOException {
+	public static void simpleReadObjectsFromFile(Context context)
+			throws IOException {
 		ObjectInputStream oos = null;
 
 		try {
-			FileInputStream fout = new FileInputStream("Data.mir");
-			oos = new ObjectInputStream(fout);
-			assets = (ArrayList<Asset>) oos.readObject();
+			InputStream inputStream = context.openFileInput("Data");
+			oos = new ObjectInputStream(inputStream);
+			sAssets = (ArrayList<Asset>) oos.readObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			oos.close();
+			if (oos != null) {
+				oos.close();
+			}
+
 		}
 	}
 
 	/**
 	 * Write main collection of instruments into local data file.
 	 */
-	public static void simpleWriteObjectsToFile() throws IOException {
+	public static void simpleWriteObjectsToFile(Context context)
+			throws IOException {
 		ObjectOutputStream oos = null;
-
+		FileOutputStream fos;
 		try {
-			FileOutputStream fout = new FileOutputStream("Data.mir");
-			oos = new ObjectOutputStream(fout);
-			oos.writeObject(GetAssets());
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
+			fos = context.openFileOutput("Data", Context.MODE_PRIVATE);
+
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(sAssets);
 			oos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
+
 }
