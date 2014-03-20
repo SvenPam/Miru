@@ -21,6 +21,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.widget.Toast;
 import assets.Asset;
 
@@ -95,6 +96,10 @@ public class MainActivity extends FragmentActivity implements
 	private SensorManager mSensorManager;
 	private float[] mAccelerometerValues = new float[3];
 	public static boolean sliftDetected = false;
+	/**
+	 * Used to retain state of camera view after ARActivity is paused/destroyed.
+	 */
+	public static SurfaceView sCCView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,16 +109,19 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	/**
-	 * Populates the action bar.
-	 * */
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.filter, menu);
-
-		return super.onCreateOptionsMenu(menu);
+	public void onPause() {
+		super.onPause();
+		try {
+			Data.simpleWriteObjectsToFile(getApplicationContext());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (sLocationClient != null) {
+			sLocationClient.disconnect();
+		}
+		mCameraPosition = sMap.getCameraPosition();
+		sMap = null;
 	}
 
 	@Override
@@ -157,9 +165,7 @@ public class MainActivity extends FragmentActivity implements
 					}
 
 					try {
-						Intent intent = new Intent(MainActivity.this,
-								InstrumentListActivity.class);
-						startActivity(intent);
+						startDetailActivity();
 					} catch (NullPointerException e) {
 
 					}
@@ -181,35 +187,47 @@ public class MainActivity extends FragmentActivity implements
 				1000000000);
 	}
 
+	/**
+	 * Populates the action bar.
+	 * */
 	@Override
-	public void onPause() {
-		super.onPause();
-		try {
-			Data.simpleWriteObjectsToFile(getApplicationContext());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (sLocationClient != null) {
-			sLocationClient.disconnect();
-		}
-		mCameraPosition = sMap.getCameraPosition();
-		sMap = null;
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.filter, menu);
+
+		menu.add(1, 1, 1, "Go to AR");
+		menu.add(1, 2, 2, "Go to Detail View");
+		menu.add(1, 3, 3, "Clear Cache");
+		menu.add(1, 4, 4, "Settings");
+
+		return super.onCreateOptionsMenu(menu);
 	}
 
-	/**
-	 * Implementation of {@link LocationListener}.
-	 */
 	@Override
-	public void onLocationChanged(Location location) {
-		if (!mIsReady) {
-			LatLng latLng = new LatLng(location.getLatitude(),
-					location.getLongitude());
-			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-					latLng, 17);
-			sMap.animateCamera(cameraUpdate);
-			mIsReady = true;
+	public boolean onOptionsItemSelected(MenuItem item) {
+		DialogFragment clearCacheDialogue;
+		switch (item.getItemId()) {
+		case R.id.action_filter:
+			filterMapMarkers("class assets." + item.getTitle());
+			item.setChecked(!item.isChecked());
+			break;
+		case 1:
+			startARActivity();
+			break;
+		case 2:
+			startDetailActivity();
+			break;
+		case 3:
+			clearCacheDialogue = new ClearCacheDialogue();
+			clearCacheDialogue.show(getFragmentManager(), "GeoTag");
+			break;
+		case 4:
+			startSettingsActivity();
+			break;
 		}
 
+		return true;
 	}
 
 	/**
@@ -236,6 +254,22 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
+	/**
+	 * Implementation of {@link LocationListener}.
+	 */
+	@Override
+	public void onLocationChanged(Location location) {
+		if (!mIsReady) {
+			LatLng latLng = new LatLng(location.getLatitude(),
+					location.getLongitude());
+			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+					latLng, 17);
+			sMap.animateCamera(cameraUpdate);
+			mIsReady = true;
+		}
+
+	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -246,7 +280,6 @@ public class MainActivity extends FragmentActivity implements
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		// writeAssetsToJSON(getApplicationContext());
 	}
 
 	/**
@@ -282,13 +315,6 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	private void setUpLocationClientIfNeeded() {
-		if (sLocationClient == null) {
-			sLocationClient = new LocationClient(getApplicationContext(), this, // ConnectionCallbacks
-					this); // OnConnectionFailedListener
-		}
-	}
-
 	@Override
 	public boolean onMyLocationButtonClick() {
 		return false;
@@ -302,6 +328,8 @@ public class MainActivity extends FragmentActivity implements
 		double lat;
 		double lng;
 
+		DialogFragment geoTagDialogue;
+
 		if (sLocationClient.getLastLocation() != null) {
 			lat = sLocationClient.getLastLocation().getLatitude();
 			lng = sLocationClient.getLastLocation().getLongitude();
@@ -310,11 +338,36 @@ public class MainActivity extends FragmentActivity implements
 			currentPosi = null;
 		}
 
-		DialogFragment newFragment = new GeoTagDialogue(currentPosi, Ltlng,
-				null, null, null);
+		geoTagDialogue = new GeoTagDialogue(currentPosi, Ltlng, null, null,
+				null);
 
-		newFragment.show(getFragmentManager(), "GeoTag");
+		geoTagDialogue.show(getFragmentManager(), "GeoTag");
 
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			mAccelerometerValues = event.values;
+			//Device has been lifted up.
+			if ((mAccelerometerValues[0] < -6 || mAccelerometerValues[0] > 6)
+					&& mAccelerometerValues[2] < 7 && !sliftDetected) {
+				startARActivity();
+			}
+		}
+
+	}
+
+	private void setUpLocationClientIfNeeded() {
+		if (sLocationClient == null) {
+			sLocationClient = new LocationClient(getApplicationContext(), this, // ConnectionCallbacks
+					this); // OnConnectionFailedListener
+		}
 	}
 
 	/**
@@ -352,13 +405,6 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		filterMapMarkers("class instruments." + item.getTitle());
-		item.setChecked(!item.isChecked());
-		return true;
-	}
-
 	/**
 	 * Toggles visibility of specified marker type.
 	 * */
@@ -384,32 +430,31 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			mAccelerometerValues = event.values;
-			System.out.println("x: " + mAccelerometerValues[0] + " | y:"
-					+ mAccelerometerValues[1] + " | z:"
-					+ mAccelerometerValues[2]);
-			//Device has been lifted up.
-			if ((mAccelerometerValues[0] < -6 || mAccelerometerValues[0] > 6)
-					&& mAccelerometerValues[2] < 7 && !sliftDetected) {
-				Intent intent = new Intent(MainActivity.this,
-						main.ARActivity.class);
-				this.startActivity(intent);
-				sliftDetected = true;
-			}
-		}
-
-	}
-
 	public static Location getLastKnownLocation() {
 		return sLocationClient.getLastLocation();
 	}
 
+	private void startARActivity() {
+
+		Intent intent = new Intent(MainActivity.this, main.ARActivity.class);
+		this.startActivity(intent);
+		if (sCCView == null) {
+			sCCView = new CustomCameraView(this);
+		}
+		sliftDetected = true;
+
+	}
+
+	private void startDetailActivity() {
+		Intent intent = new Intent(MainActivity.this,
+				InstrumentListActivity.class);
+		startActivity(intent);
+
+	}
+
+	private void startSettingsActivity() {
+		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+		startActivity(intent);
+
+	}
 }

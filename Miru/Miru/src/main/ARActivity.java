@@ -21,7 +21,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import assets.Asset;
@@ -52,6 +51,38 @@ public class ARActivity extends Activity {
 	/** Field of View - what the 'camera' can see. */
 	private double mFieldOfView = mDefaultFOV;
 
+	@Override
+	protected void onCreate(Bundle bundle) {
+		super.onCreate(bundle);
+
+		mView = new AREngine(this);
+
+		try {
+			ViewGroup vg = (ViewGroup) (MainActivity.sCCView.getParent());
+			vg.removeView(MainActivity.sCCView);
+		} catch (Exception e) {
+
+		}
+		((CustomCameraView) MainActivity.sCCView).start();
+
+		this.addContentView(MainActivity.sCCView, new ViewGroup.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT));
+
+		this.addContentView(mView, new ViewGroup.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT));
+
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		updateOrientation(new float[] { 0, 0, 0 });
+	}
+
+	private void updateOrientation(float[] values) {
+		if (values != null) {
+			mdeviceHeading = values[0];
+		}
+	}
+
 	private final SensorEventListener mListener = new SensorEventListener() {
 
 		public void onSensorChanged(SensorEvent event) {
@@ -60,6 +91,8 @@ public class ARActivity extends Activity {
 				//Device has been lifted up.
 				if ((mAccelerometerValues[0] > -3 && mAccelerometerValues[0] < 3)
 						&& mAccelerometerValues[2] > 10) {
+					MainActivity.sliftDetected = false;
+					((CustomCameraView) MainActivity.sCCView).stop();
 					finish();
 				}
 			}
@@ -83,29 +116,6 @@ public class ARActivity extends Activity {
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		}
 	};
-
-	@Override
-	protected void onCreate(Bundle bundle) {
-		super.onCreate(bundle);
-		MainActivity.sliftDetected = false;
-		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		updateOrientation(new float[] { 0, 0, 0 });
-		mView = new AREngine(this);
-		SurfaceView mCCView = new CustomCameraView(this);
-
-		this.addContentView(mCCView, new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.FILL_PARENT,
-				ViewGroup.LayoutParams.FILL_PARENT));
-		this.addContentView(mView, new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.FILL_PARENT,
-				ViewGroup.LayoutParams.FILL_PARENT));
-	}
-
-	private void updateOrientation(float[] values) {
-		if (values != null) {
-			mdeviceHeading = values[0];
-		}
-	}
 
 	private float[] calculateOrientation() {
 		float[] values = new float[3];
@@ -135,6 +145,7 @@ public class ARActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		Sensor accelerometer = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		Sensor magField = mSensorManager
@@ -149,7 +160,9 @@ public class ARActivity extends Activity {
 	@Override
 	protected void onStop() {
 		mSensorManager.unregisterListener(mListener);
+		((CustomCameraView) MainActivity.sCCView).stop();
 		super.onStop();
+		finish();
 	}
 
 	/**
@@ -177,6 +190,7 @@ public class ARActivity extends Activity {
 			int count = 0;
 			/** Used to determine the max amount of assets shown on Screen. */
 			int maxArtefacts = 30;
+			/** Used by asset iterator to place artifacts vertically on screen. */
 			int yPosi = 30;
 			int left = 0, top = 0, right = 0, bottom = 0;
 			int[] coords = new int[5];
@@ -231,8 +245,9 @@ public class ARActivity extends Activity {
 						paint.setColor(Color.WHITE);
 						canvas.drawText(asset.getName(), fltPoint - 50,
 								yPosi + 10, paint);
-						canvas.drawText(deviceLoc.distanceTo(assetLocation)
-								+ "m", fltPoint - 5, yPosi + 25, paint);
+						canvas.drawText(
+								Math.round(deviceLoc.distanceTo(assetLocation))
+										+ "m", fltPoint - 5, yPosi + 25, paint);
 
 						//Store position of artifact for listener use.
 						coords[0] = asset.getID();
@@ -264,9 +279,7 @@ public class ARActivity extends Activity {
 				canvas.drawText("Cannot find Location.", 100, 200, paint);
 			}
 
-			canvas.drawText("x: " + mAccelerometerValues[0] + " | y:"
-					+ mAccelerometerValues[1] + " | z:"
-					+ mAccelerometerValues[2], 10, 600, paint);
+			canvas.drawText(String.valueOf(mdeviceHeading), 10, 600, paint);
 		}
 
 		@Override
@@ -281,21 +294,23 @@ public class ARActivity extends Activity {
 
 		@Override
 		public boolean onTouchEvent(final MotionEvent ev) {
+			//Phrasing...
 			switch (ev.getAction()) {
 			case MotionEvent.ACTION_DOWN: {
 				int posX = Math.round(ev.getX());
 				int posY = Math.round(ev.getY());
 				int id = 0;
 				int left = 0, top = 0, right = 0, bottom = 0;
+				Rect rect;
 
 				for (int[] coords : mArtefactLocations) {
 					id = coords[0];
 					left = coords[1];
 					top = coords[2];
 					right = coords[3];
-					bottom = coords[1];
-					Rect r = new Rect(left, top, right, bottom);
-					if (r.contains(posX, posY)) {
+					bottom = coords[4];
+					rect = new Rect(left, top, right, bottom);
+					if (rect.contains(posX, posY)) {
 						MainActivity.sSelectedMarker = id;
 						Intent intent = new Intent(ARActivity.this,
 								InstrumentListActivity.class);

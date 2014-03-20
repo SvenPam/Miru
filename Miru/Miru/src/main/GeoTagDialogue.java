@@ -107,7 +107,11 @@ public class GeoTagDialogue extends DialogFragment {
 					latlng = pressedLoc;
 				}
 
-				id = Data.getAssets().get(Data.getAssets().size() - 1).getID() + 1;
+				try {
+					id = Data.getAssets().get(Data.getAssets().size()).getID() + 1;
+				} catch (Exception e) {
+					id = 1;
+				}
 
 				if (Data.getAssetMap().get(id) != null) {
 

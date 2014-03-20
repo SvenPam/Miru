@@ -21,5 +21,6 @@
     <string name="title_activity_ar">ARActivity</string>
     <string name="title_activity_surface_overlay">SurfaceOverlay</string>
     <string name="title_activity_surface_view_overlay">SurfaceViewOverlay</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 </resources>

@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
  * 
  *         Created: 06-DEC-2013
  */
-public class Pipe extends Asset implements properties.Flow, properties.Route {
+public class Pipe extends Asset implements properties.Route {
 
 	private List<LatLng> ltLngRoute;
 	private String strRouteID;

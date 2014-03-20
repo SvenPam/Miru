@@ -209,4 +209,23 @@ public class Data {
 		}
 	}
 
+	/**
+	 * Clears all data.
+	 * 
+	 * @param context
+	 * @param save
+	 *            If true, will also overwrite local file.
+	 */
+	public static void clearLocalData(Context context, boolean save) {
+		sAssets.clear();
+		if (save) {
+			try {
+				simpleWriteObjectsToFile(context);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		MainActivity.addMarkersToMap();
+	}
+
 }

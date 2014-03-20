@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:text="
+The developer(s) make no representations or warranties regarding the accuracy or completeness of any content and will not be liable for any damage or loss resulting from your use of the content or the product. Miru (this application) should NEVER be used in scenarios where life is at risk. It is NOT a replacement to your own perception and should always be used with attentiveness to your local environment. You use Miru solely at your own risk. You also agree to Google terms and conditions for the application use of Google Maps; see: www.google.com/help/terms_maps.html
+    " >
+    
+
+</TextView>

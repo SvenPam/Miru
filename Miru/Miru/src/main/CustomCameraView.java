@@ -24,28 +24,33 @@ import android.view.WindowManager;
  * */
 public class CustomCameraView extends SurfaceView {
 
-	private static Camera camera;
-	private SurfaceHolder previewHolder;
+	private static Camera mCamera;
+	private SurfaceHolder mPreviewHolder;
+	private boolean mIsRunning;
 
 	public CustomCameraView(Context context) {
 		super(context);
 
-		previewHolder = this.getHolder();
-		previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		previewHolder.addCallback(surfaceHolderListener);
+		mPreviewHolder = this.getHolder();
+		mPreviewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		mPreviewHolder.addCallback(surfaceHolderListener);
 
 	}
 
+	/**
+	 * 
+	 * @return This devices camera FOV.
+	 */
 	public static float getFOV() {
-		return camera.getParameters().getVerticalViewAngle();
+		return mCamera.getParameters().getVerticalViewAngle();
 	}
 
 	SurfaceHolder.Callback surfaceHolderListener = new SurfaceHolder.Callback() {
 		public void surfaceCreated(SurfaceHolder holder) {
 
 			try {
-				camera = Camera.open(0);
-				camera.setPreviewDisplay(previewHolder);
+				mCamera = Camera.open(0);
+				mCamera.setPreviewDisplay(mPreviewHolder);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -53,7 +58,9 @@ public class CustomCameraView extends SurfaceView {
 
 		public void surfaceChanged(SurfaceHolder holder, int format, int w,
 				int h) {
-			Camera.Parameters parameters = camera.getParameters();
+
+			start();
+			Camera.Parameters parameters = mCamera.getParameters();
 
 			List<Size> sizes = parameters.getSupportedPreviewSizes();
 			Size optimalSize = getOptimalPreviewSize(sizes, w, h);
@@ -64,25 +71,33 @@ public class CustomCameraView extends SurfaceView {
 
 			if (display.getRotation() == Surface.ROTATION_0) {
 				parameters.setPreviewSize(h, w);
-				camera.setDisplayOrientation(180);
+				mCamera.setDisplayOrientation(0);
 			}
 
 			if (display.getRotation() == Surface.ROTATION_90) {
-				camera.setDisplayOrientation(180);
+				mCamera.setDisplayOrientation(0);
 			}
 
 			if (display.getRotation() == Surface.ROTATION_180) {
-				camera.setDisplayOrientation(180);
+				mCamera.setDisplayOrientation(0);
 			}
 
 			if (display.getRotation() == Surface.ROTATION_270) {
-				camera.setDisplayOrientation(180);
+				mCamera.setDisplayOrientation(180);
 			}
 
-			camera.setParameters(parameters);
-			camera.startPreview();
+			mCamera.setParameters(parameters);
+			mCamera.startPreview();
 		}
 
+		/**
+		 * Returns the correct aspect ratio for this devices camera.
+		 * 
+		 * @param sizes
+		 * @param Width
+		 * @param Height
+		 * @return Optimal ratio size.
+		 */
 		private Size getOptimalPreviewSize(List<Size> sizes, int Width,
 				int Height) {
 			final double ASPECT_TOLERANCE = 0.05;
@@ -116,10 +131,25 @@ public class CustomCameraView extends SurfaceView {
 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder arg0) {
-			// TODO Auto-generated method stub
-
+			stop();
+			mCamera.release();
+			mCamera = null;
 		}
 
 	};
+
+	public void start() {
+		if (!mIsRunning && (mCamera != null)) {
+			mCamera.startPreview();
+			mIsRunning = true;
+		}
+	}
+
+	public void stop() {
+		if (mIsRunning && (mCamera != null)) {
+			mCamera.stopPreview();
+			mIsRunning = false;
+		}
+	}
 
 }

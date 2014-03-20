@@ -61,7 +61,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".InstrumentListActivity" />
         </activity>
-      
         <activity
             android:name="main.CameraActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -83,6 +82,26 @@
         <activity
             android:name="main.ARActivity"
             android:label="@string/title_activity_ar"
+            android:parentActivityName="main.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="main.MainActivity" />
+        </activity>
+        <activity
+            android:name="main.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name="main.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="main.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="main.MainActivity" />
+        </activity>
+        <activity
+            android:name="main.SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:parentActivityName="main.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
