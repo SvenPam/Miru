@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 import android.content.Context;
@@ -54,6 +55,36 @@ public class Data {
 
 		}
 		return sInstrumentMap;
+	}
+
+	/** Returns a single asset for passed ID. */
+	public static Asset getAsset(int ID) {
+		Asset asset = null;
+		try {
+			for (Iterator<Asset> i = sAssets.iterator(); i.hasNext();) {
+				asset = i.next();
+				if (asset.getID() == ID) {
+					break;
+				}
+
+			}
+		} catch (NoSuchElementException e) {
+			e.printStackTrace();
+		}
+
+		return asset;
+	}
+
+	/** Returns a single asset for passed ID. */
+	public static Asset getAsset(String ID) {
+		Asset asset = null;
+		try {
+			asset = getAsset(Integer.parseInt(ID));
+
+		} catch (NumberFormatException e) {
+			asset = null;
+		}
+		return asset;
 	}
 
 	/**

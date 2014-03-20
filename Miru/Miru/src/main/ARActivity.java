@@ -193,9 +193,13 @@ public class ARActivity extends Activity {
 			/** Used by asset iterator to place artifacts vertically on screen. */
 			int yPosi = 30;
 			int left = 0, top = 0, right = 0, bottom = 0;
-			int[] coords = new int[5];
+			int[] coords;
 
-			mArtefactLocations = new ArrayList<int[]>();
+			if (mArtefactLocations != null) {
+				mArtefactLocations.clear();
+			} else {
+				mArtefactLocations = new ArrayList<int[]>();
+			}
 			canvas.drawColor(Color.TRANSPARENT);
 
 			// Get device location.
@@ -234,6 +238,7 @@ public class ARActivity extends Activity {
 
 					// If the asset is visible, it goes in our bounds.
 					if (assetHeading > lowerLimit && assetHeading < upperLimit) {
+						coords = new int[5];
 						fltPoint = (float) (multiplier * ((mFieldOfView / 2) + (assetHeading - mdeviceHeading)));
 
 						left = Math.round(fltPoint) - 60;

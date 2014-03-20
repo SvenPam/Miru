@@ -208,10 +208,6 @@ public class MainActivity extends FragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		DialogFragment clearCacheDialogue;
 		switch (item.getItemId()) {
-		case R.id.action_filter:
-			filterMapMarkers("class assets." + item.getTitle());
-			item.setChecked(!item.isChecked());
-			break;
 		case 1:
 			startARActivity();
 			break;
@@ -224,6 +220,10 @@ public class MainActivity extends FragmentActivity implements
 			break;
 		case 4:
 			startSettingsActivity();
+			break;
+		default:
+			filterMapMarkers("class assets." + item.getTitle());
+			item.setChecked(!item.isChecked());
 			break;
 		}
 

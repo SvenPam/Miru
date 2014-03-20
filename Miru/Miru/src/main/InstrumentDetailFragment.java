@@ -47,8 +47,8 @@ public class InstrumentDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			mItem = Data.getAssetMap().get(
-					getArguments().getString(ARG_ITEM_ID));
+			mItem = Data.getAsset(getArguments().getString(ARG_ITEM_ID));
+			System.out.println(mItem.name);
 		}
 	}
 

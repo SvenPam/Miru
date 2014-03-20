@@ -1,5 +1,7 @@
 package main;
 
+import java.io.IOException;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -90,6 +92,7 @@ public class GeoTagDialogue extends DialogFragment {
 				EditText txt;
 				String strType, strName, strDesc, strRef;
 				LatLng latlng;
+				boolean breakLoop = false;
 
 				blnUseCurrentLocation = swt.isChecked();
 
@@ -106,15 +109,12 @@ public class GeoTagDialogue extends DialogFragment {
 				} else {
 					latlng = pressedLoc;
 				}
-
-				try {
-					id = Data.getAssets().get(Data.getAssets().size()).getID() + 1;
-				} catch (Exception e) {
-					id = 1;
-				}
-
-				if (Data.getAssetMap().get(id) != null) {
-
+				//Assign random ID.
+				while (!breakLoop) {
+					id = 0 + (int) (Math.random() * ((9999999 - 0) + 1));
+					if (Data.getAssetMap().get(id) == null) {
+						breakLoop = true;
+					}
 				}
 
 				Asset inst = null;
@@ -131,6 +131,11 @@ public class GeoTagDialogue extends DialogFragment {
 				}
 
 				Data.addAsset(inst);
+				try {
+					Data.simpleWriteObjectsToFile(getActivity());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				MainActivity.addMarkersToMap();
 			}
 		}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
