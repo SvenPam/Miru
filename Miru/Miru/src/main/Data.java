@@ -44,6 +44,23 @@ public class Data {
 	private static Map<String, Asset> sInstrumentMap = new HashMap<String, Asset>();
 
 	/**
+	 * Returns assets with distance from passed location.
+	 * 
+	 * @param Location
+	 *            to determine distance from
+	 * @returns TreeMap of key value pairs, where the key is the distance.
+	 */
+	public static Map<Float, Asset> getAssets(Location loc) {
+		Map<Float, Asset> assetsWithDistance = new TreeMap<Float, Asset>();
+		for (Iterator<Asset> i = sAssets.iterator(); i.hasNext();) {
+			Asset inst = i.next();
+			assetsWithDistance.put(loc.distanceTo(inst.getLocation()), inst);
+		}
+
+		return assetsWithDistance;
+	}
+
+	/**
 	 * Used in the detail master view, returns Map of instruments.
 	 * 
 	 * @return String Instrument pair.
@@ -104,23 +121,6 @@ public class Data {
 	 */
 	public static ArrayList<Asset> getAssets() {
 		return sAssets;
-	}
-
-	/**
-	 * Returns assets with distance from passed location.
-	 * 
-	 * @param Location
-	 *            to determine distance from
-	 * @returns TreeMap of key value pairs, where the key is the distance.
-	 */
-	public static Map<Float, Asset> getAssets(Location loc) {
-		Map<Float, Asset> assetsWithDistance = new TreeMap<Float, Asset>();
-		for (Iterator<Asset> i = sAssets.iterator(); i.hasNext();) {
-			Asset inst = i.next();
-			assetsWithDistance.put(loc.distanceTo(inst.getLocation()), inst);
-		}
-
-		return assetsWithDistance;
 	}
 
 	/**

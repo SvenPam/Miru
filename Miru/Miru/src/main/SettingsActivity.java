@@ -1,5 +1,18 @@
 package main;
 
+/**
+ * Present user with legal info and app settings.
+ * 
+ * Final Year Project
+ * 
+ * @author Stephen Pammenter
+ * 
+ *         E: spammenter@live.com W: www.ste-pam.com
+ * 
+ *         Teesside University Uni ID: K0025970
+ * 
+ *         Created: 16-MAR-2014
+ * */
 import java.util.List;
 
 import android.annotation.TargetApi;

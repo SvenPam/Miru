@@ -6,6 +6,19 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+/**
+ * Alert presented to user before clearing local data.
+ * 
+ * Final Year Project
+ * 
+ * @author Stephen Pammenter
+ * 
+ *         E: spammenter@live.com W: www.ste-pam.com
+ * 
+ *         Teesside University Uni ID: K0025970
+ * 
+ *         Created: 16-MAR-2014
+ * */
 public class ClearCacheDialogue extends DialogFragment {
 
 	@Override
